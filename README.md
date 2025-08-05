@@ -1,6 +1,8 @@
 # pubmed-mcp: MCP Server for PubMed
 
-MCP server for searching PubMed scientific articles using NCBI E-utilities API.
+[PubMed](https://pubmed.ncbi.nlm.nih.gov/) is a free database maintained by the National Library of Medicine (NLM) at the National Institutes of Health (NIH), offering access to over 30 million citations for biomedical literature.
+
+This is MCP server for searching PubMed scientific articles using NCBI E-utilities API.
 
 ## Features
 
