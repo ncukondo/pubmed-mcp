@@ -322,6 +322,86 @@ describe('PubMed API Cache', () => {
     });
   });
 
+  describe('Abstract handling', () => {
+    it('should properly handle multiple AbstractText sections without creating [Object],[Object]', async () => {
+      const mockPmid = '12345';
+      
+      // Mock response with multiple AbstractText sections (array)
+      const mockResponse = `
+        <PubmedArticleSet>
+          <PubmedArticle>
+            <MedlineCitation>
+              <PMID>${mockPmid}</PMID>
+              <Article>
+                <ArticleTitle>Test Article</ArticleTitle>
+                <Journal><Title>Test Journal</Title></Journal>
+                <Abstract>
+                  <AbstractText>First section of abstract.</AbstractText>
+                  <AbstractText>Second section of abstract.</AbstractText>
+                </Abstract>
+              </Article>
+            </MedlineCitation>
+            <PubmedData>
+              <ArticleIdList></ArticleIdList>
+            </PubmedData>
+          </PubmedArticle>
+        </PubmedArticleSet>
+      `;
+
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve(mockResponse)
+      });
+
+      const result = await api.fetchArticles([mockPmid]);
+      expect(result).toHaveLength(1);
+      expect(result[0].abstract).toBe('First section of abstract. Second section of abstract.');
+      expect(result[0].abstract).not.toContain('[Object]');
+
+      // Verify cache content doesn't contain [Object],[Object]
+      const cacheFile = join(testCacheDir, 'summary', `${mockPmid}.json`);
+      const cacheContent = await fs.readFile(cacheFile, 'utf8');
+      const cacheData = JSON.parse(cacheContent);
+      expect(cacheData.data.abstract).toBe('First section of abstract. Second section of abstract.');
+      expect(cacheData.data.abstract).not.toContain('[Object]');
+    });
+
+    it('should handle single AbstractText correctly', async () => {
+      const mockPmid = '54321';
+      
+      // Mock response with single AbstractText
+      const mockResponse = `
+        <PubmedArticleSet>
+          <PubmedArticle>
+            <MedlineCitation>
+              <PMID>${mockPmid}</PMID>
+              <Article>
+                <ArticleTitle>Test Article</ArticleTitle>
+                <Journal><Title>Test Journal</Title></Journal>
+                <Abstract>
+                  <AbstractText>Single abstract section.</AbstractText>
+                </Abstract>
+              </Article>
+            </MedlineCitation>
+            <PubmedData>
+              <ArticleIdList></ArticleIdList>
+            </PubmedData>
+          </PubmedArticle>
+        </PubmedArticleSet>
+      `;
+
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve(mockResponse)
+      });
+
+      const result = await api.fetchArticles([mockPmid]);
+      expect(result).toHaveLength(1);
+      expect(result[0].abstract).toBe('Single abstract section.');
+      expect(result[0].abstract).not.toContain('[Object]');
+    });
+  });
+
   describe('Cache without cacheDir', () => {
     it('should work normally without caching when cacheDir is not provided', async () => {
       const noCacheApi = createPubMedAPI({

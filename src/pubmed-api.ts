@@ -212,6 +212,64 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
 
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+  // Decode HTML entities to readable characters
+  const decodeHtmlEntities = (text: string): string => {
+    const entityMap: { [key: string]: string } = {
+      '&amp;': '&',
+      '&lt;': '<',
+      '&gt;': '>',
+      '&quot;': '"',
+      '&#39;': "'",
+      '&#8217;': "'", // right single quotation mark
+      '&#8216;': "'", // left single quotation mark
+      '&#8220;': '"', // left double quotation mark
+      '&#8221;': '"', // right double quotation mark
+      '&#8211;': '–', // en dash
+      '&#8212;': '—', // em dash
+      '&#8722;': '−', // minus sign
+      '&#160;': ' ',  // non-breaking space
+      '&#8201;': ' ', // thin space
+      '&#8804;': '≤', // less than or equal to
+      '&#8805;': '≥', // greater than or equal to
+      '&nbsp;': ' '
+    };
+    
+    return text.replace(/&[#\w]+;/g, (entity) => {
+      return entityMap[entity] || entity;
+    });
+  };
+
+  // Extract structured sections from PMC article body
+  const extractStructuredContent = (bodyNode: any, extractTextFromNode: (node: unknown) => string): string => {
+    if (!bodyNode || !bodyNode.sec) {
+      return '';
+    }
+
+    let content = '';
+    const sections = Array.isArray(bodyNode.sec) ? bodyNode.sec : [bodyNode.sec];
+
+    sections.forEach((section: any) => {
+      // Extract section title
+      let sectionTitle = '';
+      if (section.title) {
+        sectionTitle = extractTextFromNode(section.title);
+      }
+
+      // Add section heading
+      if (sectionTitle) {
+        content += `### ${sectionTitle}\n\n`;
+      }
+
+      // Extract section content (paragraphs, lists, etc.)
+      const sectionContent = extractTextFromNode(section);
+      if (sectionContent) {
+        content += `${sectionContent}\n\n`;
+      }
+    });
+
+    return content;
+  };
+
   const makeRequest = async (url: string): Promise<any> => {
     // Rate limiting: 3 requests per second without API key, 10 with API key
     const delayMs = apiKey ? 100 : 334;
@@ -343,7 +401,24 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
       
       // Extract abstract
       const abstractText = medlineCitation.Article?.Abstract?.AbstractText;
-      const abstract = abstractText ? String(abstractText?.['#text'] || abstractText) : undefined;
+      let abstract: string | undefined = undefined;
+      if (abstractText) {
+        if (Array.isArray(abstractText)) {
+          // Handle multiple AbstractText sections
+          abstract = abstractText
+            .map((section: any) => {
+              const text = section?.['#text'] || section;
+              return typeof text === 'string' ? text : String(text);
+            })
+            .filter(text => text && text.trim())
+            .join(' ')
+            .trim() || undefined;
+        } else {
+          // Handle single AbstractText
+          const text = abstractText?.['#text'] || abstractText;
+          abstract = typeof text === 'string' ? text : (text ? String(text) : undefined);
+        }
+      }
       
       // Extract journal
       const journalTitle = medlineCitation.Article?.Journal?.Title?.['#text'] || medlineCitation.Article?.Journal?.Title || '';
@@ -462,55 +537,26 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
   const checkFullTextAvailabilityBatch = async (pmids: string[]): Promise<{ [pmid: string]: { hasFullText: boolean; pmcId?: string } }> => {
     if (pmids.length === 0) return {};
 
-    try {
-      const params = {
-        dbfrom: 'pubmed',
-        db: 'pmc',
-        id: pmids.join(','),
-        linkname: 'pubmed_pmc',
-        retmode: 'xml'
-      };
-
-      const url = buildUrl('elink', params);
-      const xmlResponse = await makeRequest(url);
-      const parsedData = parser.parse(xmlResponse);
-
-      const results: { [pmid: string]: { hasFullText: boolean; pmcId?: string } } = {};
-      
-      // Initialize all PMIDs as not having full text
-      pmids.forEach(pmid => {
-        results[pmid] = { hasFullText: false };
-      });
-
-      const linkSets = parsedData.eLinkResult?.LinkSet;
-      if (linkSets) {
-        const linkSetsArray = Array.isArray(linkSets) ? linkSets : [linkSets];
-        
-        linkSetsArray.forEach((linkSet: any) => {
-          const fromPmid = String(linkSet.IdList?.Id?.['#text'] || linkSet.IdList?.Id || '');
-          const links = linkSet.LinkSetDb?.Link;
-          
-          if (links && fromPmid) {
-            const linksArray = Array.isArray(links) ? links : [links];
-            if (linksArray.length > 0) {
-              const pmcId = String(linksArray[0].Id?.['#text'] || linksArray[0].Id || '');
-              if (pmcId) {
-                results[fromPmid] = { hasFullText: true, pmcId };
-              }
-            }
-          }
-        });
-      }
-
-      return results;
-    } catch (error) {
-      console.error('Error checking full text availability (batch):', error);
-      const results: { [pmid: string]: { hasFullText: boolean; pmcId?: string } } = {};
-      pmids.forEach(pmid => {
-        results[pmid] = { hasFullText: false };
-      });
-      return results;
+    // For single PMID, use individual check for reliability
+    if (pmids.length === 1) {
+      const result = await checkFullTextAvailability(pmids[0]);
+      return { [pmids[0]]: result };
     }
+
+    // For multiple PMIDs, fall back to individual checks to avoid batch API parsing issues
+    // The batch API doesn't reliably map PMC IDs to specific PMIDs
+    const results: { [pmid: string]: { hasFullText: boolean; pmcId?: string } } = {};
+    
+    for (const pmid of pmids) {
+      try {
+        results[pmid] = await checkFullTextAvailability(pmid);
+      } catch (error) {
+        console.error(`Error checking availability for PMID ${pmid}:`, error);
+        results[pmid] = { hasFullText: false };
+      }
+    }
+    
+    return results;
   };
 
   const getFullText = async (pmids: string[]): Promise<FullTextResult[]> => {
@@ -564,8 +610,8 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
         const params = {
           db: 'pmc',
           id: pmcId,
-          retmode: 'xml',
-          rettype: 'full'
+          retmode: 'xml'
+          // Note: PMC database only supports rettype: null (empty) per NCBI documentation
         };
         
         const url = buildUrl('efetch', params);
@@ -579,21 +625,21 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
             if (node == null) return ''
 
             if (typeof node === 'string') {
-              return node
+              return decodeHtmlEntities(node)
             }
 
             if (Array.isArray(node)) {
               return node
                 .map(extractTextFromNode)
                 .filter(text => text.length > 0)
-                .join(' ')
+                .join('\n\n') // Use paragraph breaks for array elements
             }
 
             if (typeof node === 'object') {
               const obj = node as Record<string, unknown>
               const textValue = obj['#text']
               if (typeof textValue === 'string') {
-                return textValue
+                return decodeHtmlEntities(textValue)
               }
 
               let text = ''
@@ -619,13 +665,20 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
           }
           
           if (article.body) {
-            const content = extractTextFromNode(article.body);
-            fullText += `## Content\n\n${content}\n\n`;
+            // Try to extract structured content first
+            const structuredContent = extractStructuredContent(article.body, extractTextFromNode);
+            if (structuredContent) {
+              fullText += `## Content\n\n${structuredContent}`;
+            } else {
+              // Fallback to basic text extraction
+              const content = extractTextFromNode(article.body);
+              fullText += `## Content\n\n${content}\n\n`;
+            }
           }
           
+          // Clean up text formatting
           fullText = fullText
-            .replace(/[ \t]+/g, ' ')
-            .replace(/\n\s*\n/g, '\n\n')
+            .replace(/[ \t]+/g, ' ')                    // Multiple spaces/tabs to single space
             .trim();
 
           // Assign the same full text to all related PMIDs and cache it
