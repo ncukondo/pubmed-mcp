@@ -1,0 +1,50 @@
+{
+  "name": "@ncukondo/pubmed-mcp",
+  "version": "1.0.3",
+  "description": "MCP server for searching PubMed scientific articles",
+  "main": "dist/index.js",
+  "type": "module",
+  "bin": {
+    "pubmed-mcp": "dist/index.js"
+  },
+  "preferGlobal": true,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "prepublishOnly": "npm run build",
+    "publish": "npm publish --access public",
+    "start": "node dist/index.js",
+    "start:with-cache": "node dist/index.js --cache-dir ./cache --cache-ttl 3600",
+    "start:example": "PUBMED_EMAIL=example@email.com node dist/index.js --cache-dir ./cache --cache-ttl 7200"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "pubmed",
+    "scientific-articles",
+    "search"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "24.2.0",
+    "@vitest/ui": "^3.2.4",
+    "typescript": "^5.9.2",
+    "vite": "^7.0.6",
+    "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.1",
+    "fast-xml-parser": "^5.2.5",
+    "zod": "^3.25.76"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
