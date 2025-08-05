@@ -17,7 +17,10 @@ Node.js v18 or higher is required. Claude Code typically installs Node.js during
 ### Adding pubmed-mcp in project scope
 
 ```bash
-claude mcp add pubmed-mcp --scope project npx -y @ncukondo/mcp-server-pubmed --email your@email.com
+claude mcp add pubmed-mcp \
+  --scope project \
+  npx -y @ncukondo/pubmed-mcp \
+  --email your@email.com
 ```
 
 The `-y` option is used to skip the confirmation prompt during the initial installation.  
@@ -26,7 +29,9 @@ The `--scope project` option installs the server in project scope, creating a `.
 If you omit `--scope project`, the server will be installed globally:
 
 ```bash
-claude mcp add pubmed-mcp npx -y @ncukondo/mcp-server-pubmed --email your@email.com
+claude mcp add pubmed-mcp \
+  npx -y @ncukondo/pubmed-mcp \
+  --email your@email.com
 ```
 
 You can also set the email address via the `PUBMED_EMAIL` environment variable.
@@ -36,7 +41,11 @@ You can also set the email address via the `PUBMED_EMAIL` environment variable.
 Specifying a PubMed API key relaxes PubMed’s request rate limits. Obtain an API key by creating an NCBI account and visiting the API Key Management page:
 
 ```bash
-claude mcp add pubmed-mcp --scope project npx -y @ncukondo/mcp-server-pubmed --email your@email.com --api-key your-ncbi-api-key
+claude mcp add pubmed-mcp \
+  --scope project \
+  npx -y @ncukondo/pubmed-mcp \
+  --email your@email.com \
+  --api-key your-ncbi-api-key
 ```
 
 Alternatively, set the API key via the `PUBMED_API_KEY` environment variable.
@@ -46,13 +55,22 @@ Alternatively, set the API key via the `PUBMED_API_KEY` environment variable.
 Enabling caching returns cached results for identical requests, reducing the number of API calls:
 
 ```bash
-claude mcp add pubmed-mcp --scope project npx -y @ncukondo/mcp-server-pubmed --email your@email.com --cache-dir ./pubmed-cache
+claude mcp add pubmed-mcp \
+  --scope project npx \
+  -y @ncukondo/pubmed-mcp \
+  --email your@email.com \
+  --cache-dir ./pubmed-cache
 ```
 
 Use `--cache-dir` to specify the cache directory, and `--cache-ttl` to set the cache time-to-live in seconds (default: 1 day / 86400 seconds):
 
 ```bash
-claude mcp add pubmed-mcp --scope project npx -y @ncukondo/mcp-server-pubmed --email your@email.com --cache-dir ./pubmed-cache --cache-ttl 3600
+claude mcp add pubmed-mcp \
+  --scope project \
+  npx -y @ncukondo/pubmed-mcp \
+  --email your@email.com \
+  --cache-dir ./pubmed-cache \
+  --cache-ttl 3600
 ```
 
 ### Configuration via JSON file
@@ -68,7 +86,8 @@ Instead of running commands, you can edit the JSON file directly.
       "command": "npx",
       "args": [
         "-y",
-        "@ncukondo/mcp-server-pubmed"],
+        "@ncukondo/pubmed-mcp"
+        ],
       "env": {
         "PUBMED_EMAIL": "your@email.com"
       }
@@ -76,6 +95,7 @@ Instead of running commands, you can edit the JSON file directly.
   }
 }
 ```
+
 ## Usage with Claude Desktop
 
 ### 1. Edit Configuration File
@@ -89,7 +109,7 @@ Edit Claude Desktop's configuration file (`~/.claude/claude_desktop_config.json`
       "command": "npx",
       "args": [
         "-y",
-        "@ncukondo/mcp-server-pubmed"
+        "@ncukondo/pubmed-mcp"
       ],
       "env": {
         "PUBMED_EMAIL": "your-email@example.com"
@@ -108,7 +128,7 @@ Edit Claude Desktop's configuration file (`~/.claude/claude_desktop_config.json`
       "command": "npx",
       "args": [
         "-y",
-        "@ncukondo/mcp-server-pubmed",
+        "@ncukondo/pubmed-mcp",
         "--cache-dir",
         "./cache",
         "--cache-ttl",
@@ -128,14 +148,14 @@ Edit Claude Desktop's configuration file (`~/.claude/claude_desktop_config.json`
 If you've installed globally:
 
 ```bash
-npm install -g @ncukondo/mcp-server-pubmed
+npm install -g @ncukondo/pubmed-mcp
 ```
 
 ```json
 {
   "mcpServers": {
     "pubmed": {
-      "command": "mcp-server-pubmed",
+      "command": "pubmed-mcp",
       "args": ["--cache-dir", "./pubmed-cache"],
       "env": {
         "PUBMED_EMAIL": "your-email@example.com"
@@ -148,6 +168,7 @@ npm install -g @ncukondo/mcp-server-pubmed
 ## Requirements
 
 ### System Requirements
+
 - **Node.js**: >= 18
 - **npm**: Latest version recommended
 
@@ -165,11 +186,13 @@ npm install -g @ncukondo/mcp-server-pubmed
 Search PubMed articles with query parameters.
 
 **Parameters:**
+
 - `query` (required): Search query string
 - `max_results`: Maximum number of results (default: 20)
 - `sort`: Sort order for results
 
 **Example usage:**
+
 ```
 Search for "COVID-19 vaccine efficacy"
 ```
@@ -179,9 +202,11 @@ Search for "COVID-19 vaccine efficacy"
 Fetch detailed summary for specific PubMed articles.
 
 **Parameters:**
+
 - `pmids` (required): Array of PubMed IDs to fetch
 
 **Example usage:**
+
 ```
 Get detailed information for PMID 12345678
 ```
@@ -191,6 +216,7 @@ Get detailed information for PMID 12345678
 Get full text information for PubMed articles (when available).
 
 **Parameters:**
+
 - `pmids` (required): Array of PubMed IDs
 
 ## MCP Server Development
@@ -214,9 +240,6 @@ npm run dev
 
 # Run tests
 npm test
-
-# Test UI
-npm run test:ui
 
 # Test (CI)
 npm run test:run
