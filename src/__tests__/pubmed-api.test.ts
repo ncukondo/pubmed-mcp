@@ -437,15 +437,17 @@ describe('PubMed API', () => {
       const results = await api.getFullText(['66666666']);
       const result = results[0];
 
-      expect(mockFetch).toHaveBeenCalledTimes(1); // Only elink call - efetch not needed for this mock
+      expect(mockFetch).toHaveBeenCalledTimes(2); // elink call + efetch call for PMC content
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining('elink.fcgi')
       );
       // Only elink call is made in current implementation
 
       expect(result.pmid).toBe('66666666');
-      // Since efetch is not called due to elink parsing issue, fullText will be null
-      expect(result.fullText).toBeNull();
+      // Full text should be successfully extracted with the improved implementation
+      expect(result.fullText).toContain('Test Full Text Article');
+      expect(result.fullText).toContain('Introduction');
+      expect(result.fullText).toContain('Methods');
     });
 
     it('should return null when full text is not available', async () => {

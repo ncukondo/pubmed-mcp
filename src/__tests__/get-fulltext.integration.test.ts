@@ -27,6 +27,10 @@ describe('Get Full Text Handler Integration Tests', () => {
       expect(typeof result.fullText).toBe('string');
       expect(result.fullText!.length).toBeGreaterThan(1000);
       
+      console.log('=== FULL TEXT CONTENT ===');
+      console.log(result.fullText);
+      console.log('=== END FULL TEXT CONTENT ===');
+      
       // Should contain structured markdown content
       expect(result.fullText).toMatch(/^#\s/m); // Title as H1
       expect(result.fullText).toMatch(/^## Abstract/m); // Abstract as H2

@@ -7,6 +7,31 @@ import { XMLParser } from 'fast-xml-parser';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 
+// Global rate limiter to ensure requests across all API instances respect rate limits
+class GlobalRateLimiter {
+  private static instance: GlobalRateLimiter;
+  private queue: Promise<void> = Promise.resolve();
+  
+  static getInstance(): GlobalRateLimiter {
+    if (!GlobalRateLimiter.instance) {
+      GlobalRateLimiter.instance = new GlobalRateLimiter();
+    }
+    return GlobalRateLimiter.instance;
+  }
+  
+  async execute<T>(delayMs: number, task: () => Promise<T>): Promise<T> {
+    const execution = this.queue.then(async () => {
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+      return task();
+    });
+    
+    // Update queue for next request (ignore errors to prevent queue from stopping)
+    this.queue = execution.then(() => {}, () => {});
+    
+    return execution;
+  }
+}
+
 export interface PubMedOptions {
   email: string;
   apiKey?: string;
@@ -210,8 +235,6 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
 
   const cache = createCacheUtils();
 
-  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
   // Decode HTML entities to readable characters
   const decodeHtmlEntities = (text: string): string => {
     const entityMap: { [key: string]: string } = {
@@ -240,32 +263,42 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
   };
 
   // Extract structured sections from PMC article body
-  const extractStructuredContent = (bodyNode: any, extractTextFromNode: (node: unknown) => string): string => {
-    if (!bodyNode || !bodyNode.sec) {
+  type ExtractTextFn = (node: unknown) => string;
+
+  interface SectionNode {
+    title?: unknown;
+    sec?: SectionNode | SectionNode[];
+    [key: string]: unknown;
+  }
+
+  interface BodyNode {
+    sec?: SectionNode | SectionNode[];
+  }
+
+  const extractStructuredContent = (
+    bodyNode: BodyNode,
+    extractTextFromNode: ExtractTextFn
+  ): string => {
+    if (!bodyNode.sec) {
       return '';
     }
 
-    let content = '';
-    const sections = Array.isArray(bodyNode.sec) ? bodyNode.sec : [bodyNode.sec];
+    const sections = Array.isArray(bodyNode.sec)
+      ? bodyNode.sec
+      : [bodyNode.sec];
 
-    sections.forEach((section: any) => {
+    const content = sections.flatMap(section => {
+      if (!section) return [];
+
       // Extract section title
-      let sectionTitle = '';
-      if (section.title) {
-        sectionTitle = extractTextFromNode(section.title);
-      }
+      const sectionTitle = section.title
+        ? [`### ${extractTextFromNode(section.title)}`]
+        : [];
 
-      // Add section heading
-      if (sectionTitle) {
-        content += `### ${sectionTitle}\n\n`;
-      }
-
-      // Extract section content (paragraphs, lists, etc.)
-      const sectionContent = extractTextFromNode(section);
-      if (sectionContent) {
-        content += `${sectionContent}\n\n`;
-      }
-    });
+      // Extract section content
+      const sectionContent = [extractTextFromNode(section)];
+      return [...sectionTitle,...sectionContent];
+    }).join('\n\n').trim();
 
     return content;
   };
@@ -273,13 +306,15 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
   const makeRequest = async (url: string): Promise<any> => {
     // Rate limiting: 3 requests per second without API key, 10 with API key
     const delayMs = apiKey ? 100 : 334;
-    await delay(delayMs);
+    const limiter = GlobalRateLimiter.getInstance();
     
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.text();
+    return limiter.execute(delayMs, async () => {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.text();
+    });
   };
 
   // Initialize XML parser with appropriate options
@@ -338,21 +373,15 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
     if (pmids.length === 0) return [];
 
     // Check cache for existing articles if cache is enabled
-    const cachedArticles: Article[] = [];
-    const uncachedPmids: string[] = [];
-
-    if (cache) {
-      for (const pmid of pmids) {
-        const cached = await cache.getCachedSummary(pmid);
-        if (cached) {
-          cachedArticles.push(cached);
-        } else {
-          uncachedPmids.push(pmid);
-        }
-      }
-    } else {
-      uncachedPmids.push(...pmids);
-    }
+    const cachedArticles: Article[] = !cache 
+      ? []
+      : (await Promise.all(pmids.map(async (pmid) => {
+          const cached = await cache.getCachedSummary(pmid);
+          return cached ? [cached] : [];
+        }))).flat();
+    const uncachedPmids: string[] = pmids.filter(
+      pmid => !cachedArticles.some(article => article.pmid === pmid)
+    );
 
     // If all articles are cached, return them
     if (uncachedPmids.length === 0) {
