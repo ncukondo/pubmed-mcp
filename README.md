@@ -4,6 +4,10 @@
 
 This is MCP server for searching PubMed scientific articles using NCBI E-utilities API.
 
+<a href="https://glama.ai/mcp/servers/@ncukondo/pubmed-mcp">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@ncukondo/pubmed-mcp/badge" alt="PubMed Server MCP server" />
+</a>
+
 ## Features
 
 - Search PubMed articles with flexible query parameters
@@ -40,7 +44,7 @@ You can also set the email address via the `PUBMED_EMAIL` environment variable.
 
 ### Adding pubmed-mcp with an API key
 
-Specifying a PubMed API key relaxes PubMed’s request rate limits. Obtain an API key by creating an NCBI account and visiting the API Key Management page:
+Specifying a PubMed API key relaxes PubMed's request rate limits. Obtain an API key by creating an NCBI account and visiting the API Key Management page:
 
 ```bash
 claude mcp add pubmed-mcp \
