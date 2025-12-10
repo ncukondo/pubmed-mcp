@@ -20,7 +20,7 @@ Node.js v18 or higher is required. Claude Code typically installs Node.js during
 
 ```bash
 claude mcp add pubmed-mcp \
-  --scope project \
+  --scope project -- \
   npx -y @ncukondo/pubmed-mcp \
   --email your@email.com
 ```
@@ -31,7 +31,7 @@ The `--scope project` option installs the server in project scope, creating a `.
 If you omit `--scope project`, the server will be installed globally:
 
 ```bash
-claude mcp add pubmed-mcp \
+claude mcp add pubmed-mcp -- \
   npx -y @ncukondo/pubmed-mcp \
   --email your@email.com
 ```
@@ -44,7 +44,7 @@ Specifying a PubMed API key relaxes PubMed’s request rate limits. Obtain an AP
 
 ```bash
 claude mcp add pubmed-mcp \
-  --scope project \
+  --scope project -- \
   npx -y @ncukondo/pubmed-mcp \
   --email your@email.com \
   --api-key your-ncbi-api-key
@@ -58,8 +58,8 @@ Enabling caching returns cached results for identical requests, reducing the num
 
 ```bash
 claude mcp add pubmed-mcp \
-  --scope project npx \
-  -y @ncukondo/pubmed-mcp \
+  --scope project -- \
+  npx -y @ncukondo/pubmed-mcp \
   --email your@email.com \
   --cache-dir ./pubmed-cache
 ```
@@ -68,7 +68,7 @@ Use `--cache-dir` to specify the cache directory, and `--cache-ttl` to set the c
 
 ```bash
 claude mcp add pubmed-mcp \
-  --scope project \
+  --scope project -- \
   npx -y @ncukondo/pubmed-mcp \
   --email your@email.com \
   --cache-dir ./pubmed-cache \
