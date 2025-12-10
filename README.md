@@ -20,7 +20,7 @@ Node.js v18 or higher is required. Claude Code typically installs Node.js during
 
 ```bash
 claude mcp add pubmed-mcp \
-  --scope project \
+  --scope project -- \
   npx -y @ncukondo/pubmed-mcp \
   --email your@email.com
 ```
@@ -31,12 +31,12 @@ The `--scope project` option installs the server in project scope, creating a `.
 If you omit `--scope project`, the server will be installed globally:
 
 ```bash
-claude mcp add pubmed-mcp \
+claude mcp add pubmed-mcp -- \
   npx -y @ncukondo/pubmed-mcp \
   --email your@email.com
 ```
 
-You can also set the email address via the `PUBMED_EMAIL` environment variable.
+You can also set the email address via the `PUBMED_EMAIL` environment variable. For better security, consider managing credentials in a `.env` file.
 
 ### Adding pubmed-mcp with an API key
 
@@ -44,22 +44,24 @@ Specifying a PubMed API key relaxes PubMed’s request rate limits. Obtain an AP
 
 ```bash
 claude mcp add pubmed-mcp \
-  --scope project \
+  --scope project -- \
   npx -y @ncukondo/pubmed-mcp \
   --email your@email.com \
   --api-key your-ncbi-api-key
 ```
 
-Alternatively, set the API key via the `PUBMED_API_KEY` environment variable.
+Alternatively, set the API key via the `PUBMED_API_KEY` environment variable. For security reasons, it is recommended to store sensitive information like API keys in a `.env` file rather than in command line arguments or configuration files.
 
 ### Enabling caching
 
-Enabling caching returns cached results for identical requests, reducing the number of API calls:
+Enabling caching returns cached results for identical requests, reducing the number of API calls.
+
+#### Using command line arguments
 
 ```bash
 claude mcp add pubmed-mcp \
-  --scope project npx \
-  -y @ncukondo/pubmed-mcp \
+  --scope project -- \
+  npx -y @ncukondo/pubmed-mcp \
   --email your@email.com \
   --cache-dir ./pubmed-cache
 ```
@@ -68,12 +70,18 @@ Use `--cache-dir` to specify the cache directory, and `--cache-ttl` to set the c
 
 ```bash
 claude mcp add pubmed-mcp \
-  --scope project \
+  --scope project -- \
   npx -y @ncukondo/pubmed-mcp \
   --email your@email.com \
   --cache-dir ./pubmed-cache \
   --cache-ttl 3600
 ```
+
+You can also configure caching via environment variables. 
+
+- `PUBMED_CACHE_DIR`: Directory path for caching responses
+- `PUBMED_CACHE_TTL`: Cache time-to-live in seconds (default: 86400)
+
 
 ### Configuration via JSON file
 
@@ -178,6 +186,8 @@ npm install -g @ncukondo/pubmed-mcp
 
 - `PUBMED_EMAIL`: Email address recommended by NCBI
 - `PUBMED_API_KEY`: API key for higher rate limits (optional)
+- `PUBMED_CACHE_DIR`: Directory path for caching responses (optional)
+- `PUBMED_CACHE_TTL`: Cache time-to-live in seconds (optional, default: 86400)
 
 ## How to Use
 

@@ -112,14 +112,20 @@ describe('PubMed API Integration Tests', () => {
       // Use a PMID that is known to have PMC full text
       const knownPMIDWithPMC = '34686906'; // This should have PMC full text
 
-      const result = await api.checkFullTextAvailability(knownPMIDWithPMC);
+      const results = await api.checkFullTextAvailability([knownPMIDWithPMC]);
 
-      expect(result).toBeDefined();
-      expect(typeof result.hasFullText).toBe('boolean');
-      
-      if (result.hasFullText) {
-        expect(typeof result.pmcId).toBe('string');
-        expect(result.pmcId).toBeTruthy();
+      expect(results).toBeDefined();
+      expect(Array.isArray(results)).toBe(true);
+      expect(results.length).toBeGreaterThan(0);
+
+      const [pmid, availability] = results[0];
+      expect(pmid).toBe(knownPMIDWithPMC);
+      expect(availability).toBeDefined();
+      expect(Array.isArray(availability.links)).toBe(true);
+
+      if (availability.pmcId) {
+        expect(typeof availability.pmcId).toBe('string');
+        expect(availability.pmcId).toBeTruthy();
       }
     }, 10000);
 
@@ -127,12 +133,17 @@ describe('PubMed API Integration Tests', () => {
       // Use a PMID that likely doesn't have PMC full text
       const pmidWithoutPMC = '12345678'; // Random PMID that probably doesn't exist
 
-      const result = await api.checkFullTextAvailability(pmidWithoutPMC);
+      const results = await api.checkFullTextAvailability([pmidWithoutPMC]);
 
-      expect(result).toBeDefined();
-      expect(typeof result.hasFullText).toBe('boolean');
-      // For non-existent PMID, should return false
-      expect(result.hasFullText).toBe(false);
+      expect(results).toBeDefined();
+      expect(Array.isArray(results)).toBe(true);
+      // Results may be empty or contain entries with empty links
+      if (results.length > 0) {
+        const [pmid, availability] = results[0];
+        expect(pmid).toBe(pmidWithoutPMC);
+        expect(availability).toBeDefined();
+        expect(Array.isArray(availability.links)).toBe(true);
+      }
     }, 10000);
 
     it('should attempt to get full text for a PMC article', async () => {
@@ -157,10 +168,14 @@ describe('PubMed API Integration Tests', () => {
     it('should get full text for PMID 39090703 with known PMC ID', async () => {
       // Use the specific PMID that we tested manually
       const pmid = '39090703'; // PMC ID: 11293181
-      
+
       // First check availability
-      const availability = await api.checkFullTextAvailability(pmid);
-      expect(availability.hasFullText).toBe(true);
+      const availabilityResults = await api.checkFullTextAvailability([pmid]);
+      expect(availabilityResults).toBeDefined();
+      expect(availabilityResults.length).toBeGreaterThan(0);
+
+      const [resultPmid, availability] = availabilityResults[0];
+      expect(resultPmid).toBe(pmid);
       expect(availability.pmcId).toBe('11293181');
       
       // Then get the full text

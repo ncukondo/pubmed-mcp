@@ -6,28 +6,57 @@
 import { XMLParser } from 'fast-xml-parser';
 import { promises as fs } from 'fs';
 import { join } from 'path';
+import { z } from 'zod';
+
+const ElinkObjectIdSchema = z.object({
+  url: z.string().optional()
+}).passthrough();
+
+const ElinkIdUrlEntrySchema = z.object({
+  url: z.union([z.string(), z.array(z.string())]).optional(),
+  objectid: z.union([ElinkObjectIdSchema, z.array(ElinkObjectIdSchema)]).optional(),
+  id: z.union([z.string(), z.number()]).optional()
+}).passthrough();
+
+const ElinkIdUrlSetSchema = z.object({
+  idurl: z.union([ElinkIdUrlEntrySchema, z.array(ElinkIdUrlEntrySchema)]).optional()
+}).passthrough();
+
+const ElinkLinksetSchema = z.object({
+  dbfrom: z.string().optional(),
+  ids: z.array(z.union([z.string(), z.number()])).optional(),
+  idurlset: ElinkIdUrlSetSchema.optional()
+}).passthrough();
+
+export const ElinkLLinksResponseSchema = z.object({
+  linksets: z.array(ElinkLinksetSchema).optional()
+}).transform(v => ({
+  linksets: v.linksets ?? []
+}));
+
+export type ElinkLLinksResponse = z.infer<typeof ElinkLLinksResponseSchema>;
 
 // Global rate limiter to ensure requests across all API instances respect rate limits
 class GlobalRateLimiter {
   private static instance: GlobalRateLimiter;
   private queue: Promise<void> = Promise.resolve();
-  
+
   static getInstance(): GlobalRateLimiter {
     if (!GlobalRateLimiter.instance) {
       GlobalRateLimiter.instance = new GlobalRateLimiter();
     }
     return GlobalRateLimiter.instance;
   }
-  
+
   async execute<T>(delayMs: number, task: () => Promise<T>): Promise<T> {
     const execution = this.queue.then(async () => {
       await new Promise(resolve => setTimeout(resolve, delayMs));
       return task();
     });
-    
+
     // Update queue for next request (ignore errors to prevent queue from stopping)
-    this.queue = execution.then(() => {}, () => {});
-    
+    this.queue = execution.then(() => { }, () => { });
+
     return execution;
   }
 }
@@ -62,13 +91,14 @@ export interface Article {
 export interface FullTextResult {
   pmid: string;
   fullText: string | null;
+  links?: string[];
 }
 
 export interface PubMedAPI {
   search: (query: string, options?: SearchOptions) => Promise<SearchResult>;
   fetchArticles: (pmids: string[]) => Promise<Article[]>;
   searchAndFetch: (query: string, options?: SearchAndFetchOptions) => Promise<Article[]>;
-  checkFullTextAvailability: (pmid: string) => Promise<{ hasFullText: boolean; pmcId?: string }>;
+  checkFullTextAvailability: (pmids: ReadonlyArray<string>) => Promise<ReadonlyArray<readonly [pmid: string, result: { pmcId?: string; links: string[] }]>>;
   getFullText: (pmids: string[]) => Promise<FullTextResult[]>;
 }
 
@@ -93,6 +123,7 @@ const BASE_URL = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils';
 export interface FullTextAvailability {
   hasFullText: boolean;
   pmcId?: string;
+  links?: string[];
 }
 
 interface CacheEntry<T> {
@@ -118,11 +149,11 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
     if (apiKey) {
       url.searchParams.set('api_key', apiKey);
     }
-    
+
     Object.entries(params).forEach(([key, value]) => {
       url.searchParams.set(key, String(value));
     });
-    
+
     return url.toString();
   };
 
@@ -154,12 +185,12 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
         const filePath = join(summaryDir, `${pmid}.json`);
         const content = await fs.readFile(filePath, 'utf8');
         const cacheEntry: CacheEntry<Article> = JSON.parse(content);
-        
+
         if (isCacheEntryValid(cacheEntry.timestamp)) {
           return cacheEntry.data;
         } else {
           // Cache expired, remove the file
-          await fs.unlink(filePath).catch(() => {});
+          await fs.unlink(filePath).catch(() => { });
           return null;
         }
       } catch (error) {
@@ -187,22 +218,22 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
         const filePath = join(fulltextDir, `${pmid}.md`);
         const content = await fs.readFile(filePath, 'utf8');
         const lines = content.split('\n');
-        
+
         // First line should contain timestamp metadata
         const timestampMatch = lines[0].match(/^<!--\s*timestamp:\s*(\d+)\s*-->$/);
         if (!timestampMatch) {
           // Old format or corrupted file, remove it
-          await fs.unlink(filePath).catch(() => {});
+          await fs.unlink(filePath).catch(() => { });
           return null;
         }
-        
+
         const timestamp = parseInt(timestampMatch[1]);
         if (isCacheEntryValid(timestamp)) {
           // Return content without the timestamp line
           return lines.slice(1).join('\n').trim();
         } else {
           // Cache expired, remove the file
-          await fs.unlink(filePath).catch(() => {});
+          await fs.unlink(filePath).catch(() => { });
           return null;
         }
       } catch (error) {
@@ -256,7 +287,7 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
       '&#8805;': '≥', // greater than or equal to
       '&nbsp;': ' '
     };
-    
+
     return text.replace(/&[#\w]+;/g, (entity) => {
       return entityMap[entity] || entity;
     });
@@ -297,7 +328,7 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
 
       // Extract section content
       const sectionContent = [extractTextFromNode(section)];
-      return [...sectionTitle,...sectionContent];
+      return [...sectionTitle, ...sectionContent];
     }).join('\n\n').trim();
 
     return content;
@@ -307,7 +338,7 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
     // Rate limiting: 3 requests per second without API key, 10 with API key
     const delayMs = apiKey ? 100 : 334;
     const limiter = GlobalRateLimiter.getInstance();
-    
+
     return limiter.execute(delayMs, async () => {
       const response = await fetch(url);
       if (!response.ok) {
@@ -354,10 +385,10 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
     const url = buildUrl('esearch', params);
     const xmlResponse = await makeRequest(url);
     const parsedData = parser.parse(xmlResponse);
-    
+
     const searchResult = parsedData.eSearchResult;
-    const idList = searchResult.IdList ? 
-      (Array.isArray(searchResult.IdList.Id) ? searchResult.IdList.Id.map(String) : [String(searchResult.IdList.Id)]) : 
+    const idList = searchResult.IdList ?
+      (Array.isArray(searchResult.IdList.Id) ? searchResult.IdList.Id.map(String) : [String(searchResult.IdList.Id)]) :
       [];
     const count = parseInt(String(searchResult.Count || 0));
 
@@ -369,16 +400,16 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
     };
   };
 
-  const fetchArticles = async (pmids: string[]): Promise<Article[]> => {
+  const fetchArticles = async (pmids: ReadonlyArray<string>): Promise<Article[]> => {
     if (pmids.length === 0) return [];
 
     // Check cache for existing articles if cache is enabled
-    const cachedArticles: Article[] = !cache 
+    const cachedArticles: Article[] = !cache
       ? []
       : (await Promise.all(pmids.map(async (pmid) => {
-          const cached = await cache.getCachedSummary(pmid);
-          return cached ? [cached] : [];
-        }))).flat();
+        const cached = await cache.getCachedSummary(pmid);
+        return cached ? [cached] : [];
+      }))).flat();
     const uncachedPmids: string[] = pmids.filter(
       pmid => !cachedArticles.some(article => article.pmid === pmid)
     );
@@ -399,21 +430,21 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
     const url = buildUrl('efetch', params);
     const xmlResponse = await makeRequest(url);
     const parsedData = parser.parse(xmlResponse);
-    
+
     const fetchedArticles: Article[] = [];
     const pubmedArticles = parsedData.PubmedArticleSet?.PubmedArticle || [];
     const articlesArray = Array.isArray(pubmedArticles) ? pubmedArticles : [pubmedArticles];
-    
+
     for (const article of articlesArray) {
       if (!article.MedlineCitation) continue;
-      
+
       const medlineCitation = article.MedlineCitation;
       const pubmedData = article.PubmedData;
-      
+
       const pmid = String(medlineCitation.PMID?.['#text'] || medlineCitation.PMID || '');
-      
+
       const title = medlineCitation.Article?.ArticleTitle?.['#text'] || medlineCitation.Article?.ArticleTitle || '';
-      
+
       // Extract authors
       const authors: string[] = [];
       const authorList = medlineCitation.Article?.AuthorList?.Author;
@@ -427,7 +458,7 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
           }
         });
       }
-      
+
       // Extract abstract
       const abstractText = medlineCitation.Article?.Abstract?.AbstractText;
       let abstract: string | undefined = undefined;
@@ -448,10 +479,10 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
           abstract = typeof text === 'string' ? text : (text ? String(text) : undefined);
         }
       }
-      
+
       // Extract journal
       const journalTitle = medlineCitation.Article?.Journal?.Title?.['#text'] || medlineCitation.Article?.Journal?.Title || '';
-      
+
       // Extract publication date
       const pubDateObj = medlineCitation.Article?.Journal?.JournalIssue?.PubDate;
       let pubDate = '';
@@ -461,7 +492,7 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
         const day = pubDateObj.Day?.['#text'] || pubDateObj.Day || '';
         pubDate = [year, month, day].filter(Boolean).join('-');
       }
-      
+
       // Extract DOI
       const eLocationIDs = medlineCitation.ELocationID;
       let doi = undefined;
@@ -470,7 +501,7 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
         const doiLocation = locations.find((loc: any) => loc['@_EIdType'] === 'doi');
         doi = doiLocation ? String(doiLocation['#text'] || doiLocation) : undefined;
       }
-      
+
       // Extract PMC ID
       const articleIds = pubmedData?.ArticleIdList?.ArticleId;
       let pmcId = undefined;
@@ -478,8 +509,12 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
         const ids = Array.isArray(articleIds) ? articleIds : [articleIds];
         const pmcIdObj = ids.find((id: any) => id['@_IdType'] === 'pmc');
         pmcId = pmcIdObj ? String(pmcIdObj['#text'] || pmcIdObj) : undefined;
+        // Remove 'PMC' prefix if present
+        if (pmcId && pmcId.startsWith('PMC')) {
+          pmcId = pmcId.substring(3);
+        }
       }
-      
+
       const newArticle = {
         pmid,
         title,
@@ -515,98 +550,147 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
     return fetchArticles(searchResult.idList);
   };
 
-  const checkFullTextAvailability = async (pmid: string): Promise<{ hasFullText: boolean; pmcId?: string }> => {
-    const params = {
-      dbfrom: 'pubmed',
-      db: 'pmc',
-      id: pmid,
-      linkname: 'pubmed_pmc'
-    };
+  const getPmcIdFromIdConverter = async (pmids: ReadonlyArray<string>) => {
+    if (pmids.length === 0) return [];
 
-    const url = buildUrl('elink', params);
-    
+    const url = new URL('https://pmc.ncbi.nlm.nih.gov/tools/idconv/api/v1/articles/');
+    url.searchParams.set('format', 'json');
+    url.searchParams.set('ids', pmids.join(','));
+    if (email) url.searchParams.set('email', email);
+    url.searchParams.set('tool', 'pubmed-mcp');
+
     try {
-      const xmlResponse = await makeRequest(url);
-      const parsedData = parser.parse(xmlResponse);
-      
-      const linkSets = parsedData.eLinkResult?.LinkSet;
-      if (!linkSets) {
-        return { hasFullText: false };
+      const jsonText = await makeRequest(url.toString());
+      const data = JSON.parse(jsonText);
+      const records: any[] = Array.isArray(data?.records) ? data.records : [];
+
+      const byPmid = new Map<string, any>();
+      for (const rec of records) {
+        const rPmid = rec?.pmid ? String(rec.pmid) : undefined;
+        if (rPmid) byPmid.set(rPmid, rec);
       }
-      
-      const linkSet = Array.isArray(linkSets) ? linkSets[0] : linkSets;
-      const linkSetDbs = linkSet.LinkSetDb;
-      
-      if (!linkSetDbs) {
-        return { hasFullText: false };
-      }
-      
-      const linkSetDb = Array.isArray(linkSetDbs) ? linkSetDbs[0] : linkSetDbs;
-      const links = linkSetDb.Link;
-      
-      if (!links) {
-        return { hasFullText: false };
-      }
-      
-      const linkArray = Array.isArray(links) ? links : [links];
-      const pmcId = linkArray[0]?.Id;
-      
-      if (pmcId) {
-        return { hasFullText: true, pmcId: String(pmcId) };
-      }
-      
-      return { hasFullText: false };
+
+      return pmids.map(pmid => {
+        const rec = byPmid.get(String(pmid));
+        let pmcId = rec?.pmcid ? String(rec.pmcid) : undefined;
+        // Remove 'PMC' prefix if present
+        if (pmcId && pmcId.startsWith('PMC')) {
+          pmcId = pmcId.substring(3);
+        }
+        return [pmid, pmcId] as const;
+      }).filter(entry => entry[1]) as [pmid: string, pmcId: string][];
     } catch (error) {
-      console.error('Error checking full text availability:', error);
-      return { hasFullText: false };
+      console.error('Error querying PMC ID Converter:', error);
+      return [];
     }
   };
 
+  const getLinksFromId = async (pmids: ReadonlyArray<string>) => {
+    if (pmids.length === 0) return [];
+    const parseLinksFromJson = (jsonText: string) => {
+      const data = JSON.parse(jsonText);
+      const response = ElinkLLinksResponseSchema.parse(data);
+      const linksets = response.linksets;
+      return linksets.map(set => {
+        const ids = Array.isArray(set?.ids) ? set.ids.map((v: any) => String(v)) : [];
+        const urls: string[] = [];
 
-  const checkFullTextAvailabilityBatch = async (pmids: string[]): Promise<{ [pmid: string]: { hasFullText: boolean; pmcId?: string } }> => {
-    if (pmids.length === 0) return {};
+        const idurlset = set?.idurlset;
+        const idurl = idurlset?.idurl;
+        const entries = Array.isArray(idurl) ? idurl : (idurl ? [idurl] : []);
 
-    // For single PMID, use individual check for reliability
-    if (pmids.length === 1) {
-      const result = await checkFullTextAvailability(pmids[0]);
-      return { [pmids[0]]: result };
-    }
+        for (const entry of entries) {
+          const rawUrl = entry?.url;
+          if (typeof rawUrl === 'string') {
+            urls.push(rawUrl);
+          } else if (Array.isArray(rawUrl)) {
+            for (const u of rawUrl) {
+              if (typeof u === 'string') urls.push(u);
+            }
+          }
 
-    // For multiple PMIDs, fall back to individual checks to avoid batch API parsing issues
-    // The batch API doesn't reliably map PMC IDs to specific PMIDs
-    const results: { [pmid: string]: { hasFullText: boolean; pmcId?: string } } = {};
-    
-    for (const pmid of pmids) {
+          // Some responses include nested objectid entries with urls
+          const objectid = entry?.objectid;
+          const objArr = Array.isArray(objectid) ? objectid : (objectid ? [objectid] : []);
+          for (const oi of objArr) {
+            const u = oi?.url;
+            if (typeof u === 'string') urls.push(u);
+          }
+        }
+
+        const filtered = urls
+          .filter((u) => typeof u === 'string' && /^https?:\/\//i.test(u))
+          .map((u) => u.trim());
+
+        return [ids, filtered] as const;
+      }).filter(([ids]) => ids.length > 0).map(([ids, urls]) => {
+        return ids.map(id => [id, urls] as LinkTuple);
+      }).flat();
+    };
+
+
+    type LinkTuple = readonly [pmid: string, links: string[]];
+
+    const BATCH_SIZE = 200;
+    const chunkedPmids = pmids.reduce((acc: string[][], pmid, index) => {
+      const chunkIndex = Math.floor(index / BATCH_SIZE);
+      if (!acc[chunkIndex]) acc[chunkIndex] = [];
+      acc[chunkIndex].push(pmid);
+      return acc;
+    }, [] as string[][]);
+    const chunkedResults = await Promise.all(chunkedPmids.map(async pmids => {
       try {
-        results[pmid] = await checkFullTextAvailability(pmid);
+        const params = {
+          dbfrom: 'pubmed',
+          id: pmids.join(','),
+          retmode: 'json',
+          cmd: 'llinks'
+        };
+        const url = buildUrl('elink', params);
+
+        const jsonText = await makeRequest(url);
+        const links = parseLinksFromJson(jsonText);
+        return pmids.map(pmid => {
+          const found = links.find(([ids]) => ids.includes(pmid));
+          return found ? [pmid, found[1]] as LinkTuple : [pmid, []] as LinkTuple;
+        });
       } catch (error) {
-        console.error(`Error checking availability for PMID ${pmid}:`, error);
-        results[pmid] = { hasFullText: false };
+        console.error('Error querying elink API:', error);
+        // Return empty links for all PMIDs in this batch on error
+        return pmids.map(pmid => [pmid, []] as LinkTuple);
       }
-    }
-    
-    return results;
+    }));
+    return chunkedResults.flat();
+  }
+
+
+  const checkFullTextAvailability = async (pmids: ReadonlyArray<string>) => {
+    if (pmids.length === 0) return [];
+    const summaries = await fetchArticles(pmids);
+    const resultsFromSummaries = summaries.filter(article => article.pmcId).map(article => ([
+      article.pmid, article.pmcId as string] as const));
+    const resultsFromIdConverter = await getPmcIdFromIdConverter(pmids.filter(pmid => !resultsFromSummaries.some(([pmidExists]) => pmidExists === pmid)));
+    const pmcIdEntries = Object.fromEntries([...resultsFromSummaries, ...resultsFromIdConverter]);
+    const links = await getLinksFromId(pmids)
+    return links.map(([pmid, urls]) => {
+      const pmcId = pmcIdEntries[pmid];
+      return [pmid, { pmcId, links: urls }] as const;
+    });
   };
 
   const getFullText = async (pmids: string[]): Promise<FullTextResult[]> => {
     if (pmids.length === 0) return [];
 
     // Check cache for existing full texts if cache is enabled
-    const cachedResults: FullTextResult[] = [];
-    const uncachedPmids: string[] = [];
-
-    if (cache) {
-      for (const pmid of pmids) {
+    const cachedResults: FullTextResult[] = cache
+      ? (await Promise.all(pmids.map(async (pmid) => {
         const cached = await cache.getCachedFullText(pmid);
-        if (cached !== null) {
-          cachedResults.push({ pmid, fullText: cached });
-        } else {
-          uncachedPmids.push(pmid);
-        }
-      }
-    } else {
-      uncachedPmids.push(...pmids);
-    }
+        return cached ? { pmid, fullText: cached } : null;
+      }))).filter((result) => result !== null)
+      : [];
+    const uncachedPmids: string[] = pmids.filter(
+      pmid => !cachedResults.some(result => result.pmid === pmid)
+    );
 
     // If all full texts are cached, return them
     if (uncachedPmids.length === 0) {
@@ -614,41 +698,48 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
     }
 
     // Batch check full text availability for uncached PMIDs
-    const availabilityResults = await checkFullTextAvailabilityBatch(uncachedPmids);
-    
+    const availabilityResultsArray = await checkFullTextAvailability(uncachedPmids);
+
+    // Convert array to map for easier lookup
+    const availabilityResults = Object.fromEntries(availabilityResultsArray);
+
     // Group PMIDs by their PMC IDs for batch fetching
     const pmcToPmidMap: { [pmcId: string]: string[] } = {};
     const resultsMap: { [pmid: string]: FullTextResult } = {};
-    
+
     // Initialize results and group by PMC ID
     uncachedPmids.forEach(pmid => {
       const availability = availabilityResults[pmid];
-      if (availability.hasFullText && availability.pmcId) {
+      if (availability?.pmcId) {
         if (!pmcToPmidMap[availability.pmcId]) {
           pmcToPmidMap[availability.pmcId] = [];
         }
         pmcToPmidMap[availability.pmcId].push(pmid);
+        // Store links for later assignment
+        resultsMap[pmid] = { pmid, fullText: null, links: availability.links };
       } else {
-        resultsMap[pmid] = { pmid, fullText: null };
+        resultsMap[pmid] = { pmid, fullText: null, links: availability?.links || [] };
       }
     });
 
     // Batch fetch full texts for PMC IDs
     for (const [pmcId, relatedPmids] of Object.entries(pmcToPmidMap)) {
       try {
+        // PMC efetch API expects PMC ID with 'PMC' prefix
+        const pmcIdWithPrefix = pmcId.startsWith('PMC') ? pmcId : `PMC${pmcId}`;
         const params = {
           db: 'pmc',
-          id: pmcId,
+          id: pmcIdWithPrefix,
           retmode: 'xml'
           // Note: PMC database only supports rettype: null (empty) per NCBI documentation
         };
-        
+
         const url = buildUrl('efetch', params);
         const xmlResponse = await makeRequest(url);
         const parsedData = parser.parse(xmlResponse);
-        
+
         const article = parsedData['pmc-articleset']?.article || parsedData.pmc_articleset?.article || parsedData.article;
-        
+
         if (article) {
           const extractTextFromNode = (node: unknown): string => {
             if (node == null) return ''
@@ -680,19 +771,19 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
 
             return ''
           }
-          
+
           let fullText = '';
-          
+
           if (article.front?.['article-meta']?.['title-group']?.['article-title']) {
             const title = extractTextFromNode(article.front['article-meta']['title-group']['article-title']);
             fullText += `# ${title}\n\n`;
           }
-          
+
           if (article.front?.['article-meta']?.abstract) {
             const abstract = extractTextFromNode(article.front['article-meta'].abstract);
             fullText += `## Abstract\n\n${abstract}\n\n`;
           }
-          
+
           if (article.body) {
             // Try to extract structured content first
             const structuredContent = extractStructuredContent(article.body, extractTextFromNode);
@@ -704,7 +795,7 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
               fullText += `## Content\n\n${content}\n\n`;
             }
           }
-          
+
           // Clean up text formatting
           fullText = fullText
             .replace(/[ \t]+/g, ' ')                    // Multiple spaces/tabs to single space
@@ -712,8 +803,13 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
 
           // Assign the same full text to all related PMIDs and cache it
           for (const pmid of relatedPmids) {
-            resultsMap[pmid] = { pmid, fullText: fullText || null };
-            
+            const existingLinks = resultsMap[pmid]?.links;
+            resultsMap[pmid] = {
+              pmid,
+              fullText: fullText || null,
+              ...(existingLinks && existingLinks.length > 0 && { links: existingLinks })
+            };
+
             // Cache the full text if cache is enabled and fullText is not null
             if (cache && fullText) {
               try {
@@ -726,13 +822,23 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
         } else {
           // No article found for this PMC ID
           relatedPmids.forEach(pmid => {
-            resultsMap[pmid] = { pmid, fullText: null };
+            const existingLinks = resultsMap[pmid]?.links;
+            resultsMap[pmid] = {
+              pmid,
+              fullText: null,
+              ...(existingLinks && existingLinks.length > 0 && { links: existingLinks })
+            };
           });
         }
       } catch (error) {
         console.error(`Error fetching full text for PMC ID ${pmcId}:`, error);
         relatedPmids.forEach(pmid => {
-          resultsMap[pmid] = { pmid, fullText: null };
+          const existingLinks = resultsMap[pmid]?.links;
+          resultsMap[pmid] = {
+            pmid,
+            fullText: null,
+            ...(existingLinks && existingLinks.length > 0 && { links: existingLinks })
+          };
         });
       }
     }

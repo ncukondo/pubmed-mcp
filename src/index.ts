@@ -124,18 +124,35 @@ server.registerTool(
     description: 'Search PubMed for scientific articles.',
     inputSchema: {
       query: z.string().describe('Search query for PubMed'),
-      searchOptions: z.object({
-        retMax: z.number().optional().describe('Maximum number of results to return'),
-        retStart: z.number().optional().describe('Starting index for results'),
-        sort: z.enum(['relevance', 'pub_date', 'author', 'journal']).optional().describe('Sort order for results'),
-        dateFrom: z.string().optional().describe('Start date filter (YYYY/MM/DD format)'),
-        dateTo: z.string().optional().describe('End date filter (YYYY/MM/DD format)'),
-      }).optional().describe('Optional search parameters')
-    }
+      searchOptions: z
+        .object({
+          retMax: z.number().optional().describe('Maximum number of results to return'),
+          retStart: z.number().optional().describe('Starting index for results'),
+          sort: z
+            .enum(['relevance', 'pub_date', 'author', 'journal'])
+            .optional()
+            .describe('Sort order for results'),
+          dateFrom: z.string().optional().describe('Start date filter (YYYY/MM/DD format)'),
+          dateTo: z.string().optional().describe('End date filter (YYYY/MM/DD format)(If dateFrom is provided but dateTo is missing, set dateTo to today\'s date)'),
+        })
+        .optional()
+        .describe('Optional search parameters'),
+    },
   },
   async ({ query, searchOptions }) => {
     try {
-      const results = await searchHandler.search(query, searchOptions);
+      const options = { ...(searchOptions || {}) };
+
+      // If dateFrom is provided but dateTo is missing, set dateTo to today's date
+      if (options.dateFrom && !options.dateTo) {
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        options.dateTo = `${yyyy}/${mm}/${dd}`;
+      }
+
+      const results = await searchHandler.search(query, options);
       return {
         content: [
           {
@@ -234,11 +251,11 @@ async function main() {
       Cache Directory: ${cacheDir || 'Not configured (caching disabled)'}
       Cache TTL: ${cacheTTL ? `${cacheTTL} seconds` : '86400 seconds (default)'}
   `;
-  console.log(configMessage);
-  
+  console.error(configMessage);
+
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.log('MCP PubMed server running on stdio');
+  console.error('MCP PubMed server running on stdio');
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

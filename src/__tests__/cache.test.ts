@@ -197,6 +197,24 @@ describe('PubMed API Cache', () => {
     const mockPmcId = '67890';
 
     beforeEach(() => {
+      // Mock fetchArticles (esummary) response
+      const mockSummaryResponse = `<?xml version="1.0" encoding="UTF-8"?>
+        <eSummaryResult>
+          <DocSum>
+            <Id>${mockPmid}</Id>
+            <Item Name="PubDate" Type="Date">2023</Item>
+            <Item Name="Title" Type="String">Test Article</Item>
+          </DocSum>
+        </eSummaryResult>`;
+
+      // Mock getPmcIdFromIdConverter response
+      const mockIdConverterResponse = JSON.stringify({
+        records: [{
+          pmid: mockPmid,
+          pmcid: `PMC${mockPmcId}`
+        }]
+      });
+
       // Mock elink response for full text availability
       const mockElinkResponse = `
         <eLinkResult>
@@ -227,6 +245,14 @@ describe('PubMed API Cache', () => {
       `;
 
       global.fetch = vi.fn()
+        .mockResolvedValueOnce({
+          ok: true,
+          text: () => Promise.resolve(mockSummaryResponse)
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          text: () => Promise.resolve(mockIdConverterResponse)
+        })
         .mockResolvedValueOnce({
           ok: true,
           text: () => Promise.resolve(mockElinkResponse)
@@ -283,6 +309,26 @@ describe('PubMed API Cache', () => {
 
       // Reset fetch mock for second call
       global.fetch = vi.fn()
+        .mockResolvedValueOnce({
+          ok: true,
+          text: () => Promise.resolve(`<?xml version="1.0" encoding="UTF-8"?>
+            <eSummaryResult>
+              <DocSum>
+                <Id>${mockPmid}</Id>
+                <Item Name="PubDate" Type="Date">2023</Item>
+                <Item Name="Title" Type="String">Test Article</Item>
+              </DocSum>
+            </eSummaryResult>`)
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          text: () => Promise.resolve(JSON.stringify({
+            records: [{
+              pmid: mockPmid,
+              pmcid: `PMC${mockPmcId}`
+            }]
+          }))
+        })
         .mockResolvedValueOnce({
           ok: true,
           text: () => Promise.resolve(`
