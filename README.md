@@ -36,7 +36,7 @@ claude mcp add pubmed-mcp -- \
   --email your@email.com
 ```
 
-You can also set the email address via the `PUBMED_EMAIL` environment variable.
+You can also set the email address via the `PUBMED_EMAIL` environment variable. For better security, consider managing credentials in a `.env` file.
 
 ### Adding pubmed-mcp with an API key
 
@@ -50,11 +50,13 @@ claude mcp add pubmed-mcp \
   --api-key your-ncbi-api-key
 ```
 
-Alternatively, set the API key via the `PUBMED_API_KEY` environment variable.
+Alternatively, set the API key via the `PUBMED_API_KEY` environment variable. For security reasons, it is recommended to store sensitive information like API keys in a `.env` file rather than in command line arguments or configuration files.
 
 ### Enabling caching
 
-Enabling caching returns cached results for identical requests, reducing the number of API calls:
+Enabling caching returns cached results for identical requests, reducing the number of API calls.
+
+#### Using command line arguments
 
 ```bash
 claude mcp add pubmed-mcp \
@@ -74,6 +76,12 @@ claude mcp add pubmed-mcp \
   --cache-dir ./pubmed-cache \
   --cache-ttl 3600
 ```
+
+You can also configure caching via environment variables. 
+
+- `PUBMED_CACHE_DIR`: Directory path for caching responses
+- `PUBMED_CACHE_TTL`: Cache time-to-live in seconds (default: 86400)
+
 
 ### Configuration via JSON file
 
@@ -178,6 +186,8 @@ npm install -g @ncukondo/pubmed-mcp
 
 - `PUBMED_EMAIL`: Email address recommended by NCBI
 - `PUBMED_API_KEY`: API key for higher rate limits (optional)
+- `PUBMED_CACHE_DIR`: Directory path for caching responses (optional)
+- `PUBMED_CACHE_TTL`: Cache time-to-live in seconds (optional, default: 86400)
 
 ## How to Use
 
