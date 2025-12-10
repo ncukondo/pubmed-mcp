@@ -486,4 +486,301 @@ describe('PubMed API Cache', () => {
       expect(cacheExists).toBe(false);
     });
   });
+
+  describe('Cache File Path', () => {
+    const mockPmid = '99999';
+
+    describe('Summary cacheFilePath', () => {
+      beforeEach(() => {
+        const mockResponse = `
+          <PubmedArticleSet>
+            <PubmedArticle>
+              <MedlineCitation>
+                <PMID>${mockPmid}</PMID>
+                <Article>
+                  <ArticleTitle>Test Article for Cache Path</ArticleTitle>
+                  <Journal><Title>Test Journal</Title></Journal>
+                  <AuthorList>
+                    <Author>
+                      <LastName>Smith</LastName>
+                      <ForeName>John</ForeName>
+                    </Author>
+                  </AuthorList>
+                  <Abstract>
+                    <AbstractText>Test abstract.</AbstractText>
+                  </Abstract>
+                </Article>
+              </MedlineCitation>
+              <PubmedData>
+                <ArticleIdList></ArticleIdList>
+              </PubmedData>
+            </PubmedArticle>
+          </PubmedArticleSet>
+        `;
+
+        global.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          text: () => Promise.resolve(mockResponse)
+        });
+      });
+
+      it('should return cacheFilePath for newly fetched articles when cache is enabled', async () => {
+        const result = await api.fetchArticles([mockPmid]);
+        
+        expect(result).toHaveLength(1);
+        expect(result[0].cacheFilePath).toBeDefined();
+        expect(result[0].cacheFilePath).toBe(join(testCacheDir, 'summary', `${mockPmid}.json`));
+        
+        // Verify the file actually exists at that path
+        const fileExists = await fs.access(result[0].cacheFilePath!).then(() => true).catch(() => false);
+        expect(fileExists).toBe(true);
+      });
+
+      it('should return cacheFilePath for cached articles on subsequent calls', async () => {
+        // First call - fetch and cache
+        await api.fetchArticles([mockPmid]);
+        
+        // Clear mock to ensure second call uses cache
+        (global.fetch as any).mockClear();
+        
+        // Second call - should return from cache with cacheFilePath
+        const result = await api.fetchArticles([mockPmid]);
+        
+        expect(result).toHaveLength(1);
+        expect(result[0].cacheFilePath).toBeDefined();
+        expect(result[0].cacheFilePath).toBe(join(testCacheDir, 'summary', `${mockPmid}.json`));
+        
+        // Verify no API calls were made (using cache)
+        expect(global.fetch).not.toHaveBeenCalled();
+      });
+
+      it('should not return cacheFilePath when cache is disabled', async () => {
+        const noCacheApi = createPubMedAPI({
+          email: 'test@example.com'
+          // No cacheDir provided
+        });
+
+        const result = await noCacheApi.fetchArticles([mockPmid]);
+        
+        expect(result).toHaveLength(1);
+        expect(result[0].cacheFilePath).toBeUndefined();
+      });
+    });
+
+    describe('Full text cacheFilePath', () => {
+      const mockPmcId = '88888';
+
+      beforeEach(() => {
+        // Mock fetchArticles (efetch) response
+        const mockSummaryResponse = `
+          <PubmedArticleSet>
+            <PubmedArticle>
+              <MedlineCitation>
+                <PMID>${mockPmid}</PMID>
+                <Article>
+                  <ArticleTitle>Test Article</ArticleTitle>
+                  <Journal><Title>Test Journal</Title></Journal>
+                </Article>
+              </MedlineCitation>
+              <PubmedData>
+                <ArticleIdList>
+                  <ArticleId IdType="pmc">PMC${mockPmcId}</ArticleId>
+                </ArticleIdList>
+              </PubmedData>
+            </PubmedArticle>
+          </PubmedArticleSet>
+        `;
+
+        // Mock elink response
+        const mockElinkResponse = JSON.stringify({
+          linksets: [{
+            dbfrom: 'pubmed',
+            ids: [mockPmid],
+            idurlset: {
+              idurl: [{
+                id: mockPmid,
+                url: 'https://example.com/fulltext'
+              }]
+            }
+          }]
+        });
+
+        // Mock PMC full text response
+        const mockPmcResponse = `
+          <pmc-articleset>
+            <article>
+              <front>
+                <article-meta>
+                  <title-group>
+                    <article-title>Full Text Test Article</article-title>
+                  </title-group>
+                  <abstract>Full text abstract</abstract>
+                </article-meta>
+              </front>
+              <body>Full text content body</body>
+            </article>
+          </pmc-articleset>
+        `;
+
+        global.fetch = vi.fn()
+          .mockResolvedValueOnce({
+            ok: true,
+            text: () => Promise.resolve(mockSummaryResponse)
+          })
+          .mockResolvedValueOnce({
+            ok: true,
+            text: () => Promise.resolve(mockElinkResponse)
+          })
+          .mockResolvedValueOnce({
+            ok: true,
+            text: () => Promise.resolve(mockPmcResponse)
+          });
+      });
+
+      it('should return cacheFilePath for newly fetched full text when cache is enabled', async () => {
+        const result = await api.getFullText([mockPmid]);
+        
+        expect(result).toHaveLength(1);
+        expect(result[0].fullText).toContain('Full Text Test Article');
+        expect(result[0].cacheFilePath).toBeDefined();
+        expect(result[0].cacheFilePath).toBe(join(testCacheDir, 'fulltext', `${mockPmid}.md`));
+        
+        // Verify the file actually exists at that path
+        const fileExists = await fs.access(result[0].cacheFilePath!).then(() => true).catch(() => false);
+        expect(fileExists).toBe(true);
+      });
+
+      it('should return cacheFilePath for cached full text on subsequent calls', async () => {
+        // First call - fetch and cache
+        await api.getFullText([mockPmid]);
+        
+        // Clear mock to ensure second call uses cache
+        (global.fetch as any).mockClear();
+        
+        // Second call - should return from cache with cacheFilePath
+        const result = await api.getFullText([mockPmid]);
+        
+        expect(result).toHaveLength(1);
+        expect(result[0].cacheFilePath).toBeDefined();
+        expect(result[0].cacheFilePath).toBe(join(testCacheDir, 'fulltext', `${mockPmid}.md`));
+        
+        // Verify no API calls were made (using cache)
+        expect(global.fetch).not.toHaveBeenCalled();
+      });
+
+      it('should not return cacheFilePath for full text when cache is disabled', async () => {
+        const noCacheApi = createPubMedAPI({
+          email: 'test@example.com'
+          // No cacheDir provided
+        });
+
+        // Re-setup mocks for noCacheApi
+        global.fetch = vi.fn()
+          .mockResolvedValueOnce({
+            ok: true,
+            text: () => Promise.resolve(`
+              <PubmedArticleSet>
+                <PubmedArticle>
+                  <MedlineCitation>
+                    <PMID>${mockPmid}</PMID>
+                    <Article>
+                      <ArticleTitle>Test Article</ArticleTitle>
+                      <Journal><Title>Test Journal</Title></Journal>
+                    </Article>
+                  </MedlineCitation>
+                  <PubmedData>
+                    <ArticleIdList>
+                      <ArticleId IdType="pmc">PMC${mockPmcId}</ArticleId>
+                    </ArticleIdList>
+                  </PubmedData>
+                </PubmedArticle>
+              </PubmedArticleSet>
+            `)
+          })
+          .mockResolvedValueOnce({
+            ok: true,
+            text: () => Promise.resolve(JSON.stringify({
+              linksets: [{
+                dbfrom: 'pubmed',
+                ids: [mockPmid],
+                idurlset: {
+                  idurl: [{
+                    id: mockPmid,
+                    url: 'https://example.com/fulltext'
+                  }]
+                }
+              }]
+            }))
+          })
+          .mockResolvedValueOnce({
+            ok: true,
+            text: () => Promise.resolve(`
+              <pmc-articleset>
+                <article>
+                  <front>
+                    <article-meta>
+                      <title-group>
+                        <article-title>Full Text Test Article</article-title>
+                      </title-group>
+                    </article-meta>
+                  </front>
+                  <body>Full text content body</body>
+                </article>
+              </pmc-articleset>
+            `)
+          });
+
+        const result = await noCacheApi.getFullText([mockPmid]);
+        
+        expect(result).toHaveLength(1);
+        expect(result[0].cacheFilePath).toBeUndefined();
+      });
+
+      it('should not return cacheFilePath when full text is not available', async () => {
+        const pmidWithoutFullText = '77777';
+        
+        // Mock response with no PMC ID
+        global.fetch = vi.fn()
+          .mockResolvedValueOnce({
+            ok: true,
+            text: () => Promise.resolve(`
+              <PubmedArticleSet>
+                <PubmedArticle>
+                  <MedlineCitation>
+                    <PMID>${pmidWithoutFullText}</PMID>
+                    <Article>
+                      <ArticleTitle>Article without full text</ArticleTitle>
+                      <Journal><Title>Test Journal</Title></Journal>
+                    </Article>
+                  </MedlineCitation>
+                  <PubmedData>
+                    <ArticleIdList></ArticleIdList>
+                  </PubmedData>
+                </PubmedArticle>
+              </PubmedArticleSet>
+            `)
+          })
+          .mockResolvedValueOnce({
+            ok: true,
+            text: () => Promise.resolve(JSON.stringify({ records: [] }))
+          })
+          .mockResolvedValueOnce({
+            ok: true,
+            text: () => Promise.resolve(JSON.stringify({
+              linksets: [{
+                dbfrom: 'pubmed',
+                ids: [pmidWithoutFullText],
+                idurlset: {}
+              }]
+            }))
+          });
+
+        const result = await api.getFullText([pmidWithoutFullText]);
+        
+        expect(result).toHaveLength(1);
+        expect(result[0].fullText).toBeNull();
+        expect(result[0].cacheFilePath).toBeUndefined();
+      });
+    });
+  });
 });
