@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { createGetFullTextHandler } from '../handlers/get-fulltext.js';
 
-describe('Get Full Text Handler Integration Tests', () => {
+describe.sequential('Get Full Text Handler Integration Tests', () => {
   let handler: ReturnType<typeof createGetFullTextHandler>;
 
   beforeAll(() => {

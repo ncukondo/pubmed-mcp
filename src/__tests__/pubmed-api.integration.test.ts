@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { createPubMedAPI, type PubMedAPI } from '../pubmed-api.js';
 
-describe('PubMed API Integration Tests', () => {
+describe.sequential('PubMed API Integration Tests', () => {
   let api: PubMedAPI;
 
   beforeAll(() => {
