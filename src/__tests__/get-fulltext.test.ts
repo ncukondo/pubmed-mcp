@@ -35,10 +35,12 @@ describe('Get Full Text Handler', () => {
       {
         pmid: '12345',
         fullText: '# Test Article\n\n## Abstract\n\nThis is a test abstract.\n\n## Content\n\nThis is test content.',
+        links: ['https://example.com/article1.pdf'],
       },
       {
         pmid: '67890',
         fullText: null,
+        links: [],
       },
     ];
 
@@ -66,6 +68,7 @@ describe('Get Full Text Handler', () => {
       {
         pmid: '12345',
         fullText: '# Single Article\n\n## Abstract\n\nSingle test abstract.',
+        links: ['https://pmc.ncbi.nlm.nih.gov/articles/PMC123/'],
       },
     ];
 
@@ -103,14 +106,17 @@ describe('Get Full Text Handler', () => {
       {
         pmid: '12345',
         fullText: '# Available Article\n\nFull text content here.',
+        links: ['https://example.com/article.pdf'],
       },
       {
         pmid: '67890',
         fullText: null,
+        links: [],
       },
       {
         pmid: '11111',
         fullText: null,
+        links: [],
       },
     ];
 
@@ -123,5 +129,26 @@ describe('Get Full Text Handler', () => {
     expect(result[0].fullText).toBeTruthy();
     expect(result[1].fullText).toBeNull();
     expect(result[2].fullText).toBeNull();
+  });
+
+  it('should include links field in results when available', async () => {
+    const mockResults = [
+      {
+        pmid: '12345',
+        fullText: '# Test Article',
+        links: ['https://example.com/pdf', 'https://pmc.ncbi.nlm.nih.gov/articles/PMC123/'],
+      },
+    ];
+
+    mockPubMedAPI.getFullText.mockResolvedValue(mockResults);
+
+    const handler = createGetFullTextHandler(mockPubMedOptions);
+    const result = await handler.getFullText(['12345']);
+
+    expect(result[0].links).toBeDefined();
+    expect(Array.isArray(result[0].links)).toBe(true);
+    expect(result[0].links).toHaveLength(2);
+    expect(result[0].links).toContain('https://example.com/pdf');
+    expect(result[0].links).toContain('https://pmc.ncbi.nlm.nih.gov/articles/PMC123/');
   });
 });

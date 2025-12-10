@@ -91,13 +91,14 @@ export interface Article {
 export interface FullTextResult {
   pmid: string;
   fullText: string | null;
+  links?: string[];
 }
 
 export interface PubMedAPI {
   search: (query: string, options?: SearchOptions) => Promise<SearchResult>;
   fetchArticles: (pmids: string[]) => Promise<Article[]>;
   searchAndFetch: (query: string, options?: SearchAndFetchOptions) => Promise<Article[]>;
-  checkFullTextAvailability: (pmid: string) => Promise<{ hasFullText: boolean; pmcId?: string }>;
+  checkFullTextAvailability: (pmids: ReadonlyArray<string>) => Promise<ReadonlyArray<readonly [pmid: string, result: { pmcId?: string; links: string[] }]>>;
   getFullText: (pmids: string[]) => Promise<FullTextResult[]>;
 }
 
@@ -122,6 +123,7 @@ const BASE_URL = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils';
 export interface FullTextAvailability {
   hasFullText: boolean;
   pmcId?: string;
+  links?: string[];
 }
 
 interface CacheEntry<T> {
@@ -683,7 +685,10 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
     }
 
     // Batch check full text availability for uncached PMIDs
-    const availabilityResults = await checkFullTextAvailability(uncachedPmids);
+    const availabilityResultsArray = await checkFullTextAvailability(uncachedPmids);
+
+    // Convert array to map for easier lookup
+    const availabilityResults = Object.fromEntries(availabilityResultsArray);
 
     // Group PMIDs by their PMC IDs for batch fetching
     const pmcToPmidMap: { [pmcId: string]: string[] } = {};
@@ -692,13 +697,15 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
     // Initialize results and group by PMC ID
     uncachedPmids.forEach(pmid => {
       const availability = availabilityResults[pmid];
-      if (availability.hasFullText && availability.pmcId) {
+      if (availability?.pmcId) {
         if (!pmcToPmidMap[availability.pmcId]) {
           pmcToPmidMap[availability.pmcId] = [];
         }
         pmcToPmidMap[availability.pmcId].push(pmid);
+        // Store links for later assignment
+        resultsMap[pmid] = { pmid, fullText: null, links: availability.links };
       } else {
-        resultsMap[pmid] = { pmid, fullText: null };
+        resultsMap[pmid] = { pmid, fullText: null, links: availability?.links || [] };
       }
     });
 
@@ -781,7 +788,12 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
 
           // Assign the same full text to all related PMIDs and cache it
           for (const pmid of relatedPmids) {
-            resultsMap[pmid] = { pmid, fullText: fullText || null };
+            const existingLinks = resultsMap[pmid]?.links;
+            resultsMap[pmid] = {
+              pmid,
+              fullText: fullText || null,
+              ...(existingLinks && existingLinks.length > 0 && { links: existingLinks })
+            };
 
             // Cache the full text if cache is enabled and fullText is not null
             if (cache && fullText) {
@@ -795,13 +807,23 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
         } else {
           // No article found for this PMC ID
           relatedPmids.forEach(pmid => {
-            resultsMap[pmid] = { pmid, fullText: null };
+            const existingLinks = resultsMap[pmid]?.links;
+            resultsMap[pmid] = {
+              pmid,
+              fullText: null,
+              ...(existingLinks && existingLinks.length > 0 && { links: existingLinks })
+            };
           });
         }
       } catch (error) {
         console.error(`Error fetching full text for PMC ID ${pmcId}:`, error);
         relatedPmids.forEach(pmid => {
-          resultsMap[pmid] = { pmid, fullText: null };
+          const existingLinks = resultsMap[pmid]?.links;
+          resultsMap[pmid] = {
+            pmid,
+            fullText: null,
+            ...(existingLinks && existingLinks.length > 0 && { links: existingLinks })
+          };
         });
       }
     }
