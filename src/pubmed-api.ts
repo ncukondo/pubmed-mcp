@@ -509,6 +509,10 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
         const ids = Array.isArray(articleIds) ? articleIds : [articleIds];
         const pmcIdObj = ids.find((id: any) => id['@_IdType'] === 'pmc');
         pmcId = pmcIdObj ? String(pmcIdObj['#text'] || pmcIdObj) : undefined;
+        // Remove 'PMC' prefix if present
+        if (pmcId && pmcId.startsWith('PMC')) {
+          pmcId = pmcId.substring(3);
+        }
       }
 
       const newArticle = {
@@ -549,7 +553,7 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
   const getPmcIdFromIdConverter = async (pmids: ReadonlyArray<string>) => {
     if (pmids.length === 0) return [];
 
-    const url = new URL('https://pmc.ncbi.nlm.nih.gov/utils/idconv/v1.0/');
+    const url = new URL('https://pmc.ncbi.nlm.nih.gov/tools/idconv/api/v1/articles/');
     url.searchParams.set('format', 'json');
     url.searchParams.set('ids', pmids.join(','));
     if (email) url.searchParams.set('email', email);
@@ -568,7 +572,11 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
 
       return pmids.map(pmid => {
         const rec = byPmid.get(String(pmid));
-        const pmcId = rec?.pmcid ? String(rec.pmcid) : undefined;
+        let pmcId = rec?.pmcid ? String(rec.pmcid) : undefined;
+        // Remove 'PMC' prefix if present
+        if (pmcId && pmcId.startsWith('PMC')) {
+          pmcId = pmcId.substring(3);
+        }
         return [pmid, pmcId] as const;
       }).filter(entry => entry[1]) as [pmid: string, pmcId: string][];
     } catch (error) {
@@ -631,21 +639,26 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
       return acc;
     }, [] as string[][]);
     const chunkedResults = await Promise.all(chunkedPmids.map(async pmids => {
-      const params = {
-        dbfrom: 'pubmed',
-        id: pmids.join(','),
-        retmode: 'json',
-        cmd: 'llinks'
-      };
-      const url = buildUrl('elink', params);
+      try {
+        const params = {
+          dbfrom: 'pubmed',
+          id: pmids.join(','),
+          retmode: 'json',
+          cmd: 'llinks'
+        };
+        const url = buildUrl('elink', params);
 
-      const jsonText = await makeRequest(url);
-      const links = parseLinksFromJson(jsonText);
-      return pmids.map(pmid => {
-        const found = links.find(([ids]) => ids.includes(pmid));
-        return found ? [pmid, found[1]] as LinkTuple : [pmid, []] as LinkTuple;
-      });
-
+        const jsonText = await makeRequest(url);
+        const links = parseLinksFromJson(jsonText);
+        return pmids.map(pmid => {
+          const found = links.find(([ids]) => ids.includes(pmid));
+          return found ? [pmid, found[1]] as LinkTuple : [pmid, []] as LinkTuple;
+        });
+      } catch (error) {
+        console.error('Error querying elink API:', error);
+        // Return empty links for all PMIDs in this batch on error
+        return pmids.map(pmid => [pmid, []] as LinkTuple);
+      }
     }));
     return chunkedResults.flat();
   }
@@ -712,9 +725,11 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
     // Batch fetch full texts for PMC IDs
     for (const [pmcId, relatedPmids] of Object.entries(pmcToPmidMap)) {
       try {
+        // PMC efetch API expects PMC ID with 'PMC' prefix
+        const pmcIdWithPrefix = pmcId.startsWith('PMC') ? pmcId : `PMC${pmcId}`;
         const params = {
           db: 'pmc',
-          id: pmcId,
+          id: pmcIdWithPrefix,
           retmode: 'xml'
           // Note: PMC database only supports rettype: null (empty) per NCBI documentation
         };
