@@ -544,8 +544,6 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
         pmcId
       };
 
-      fetchedArticles.push(newArticle);
-
       // Cache the new article if cache is enabled
       if (cache) {
         // For better reliability in tests, we wait for cache operations
