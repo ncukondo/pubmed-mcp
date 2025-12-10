@@ -86,12 +86,14 @@ export interface Article {
   pmcId?: string;
   fullText?: string;
   hasFullText?: boolean;
+  cacheFilePath?: string;
 }
 
 export interface FullTextResult {
   pmid: string;
   fullText: string | null;
   links?: string[];
+  cacheFilePath?: string;
 }
 
 export interface PubMedAPI {
@@ -138,6 +140,8 @@ interface CacheUtils {
   getCachedFullText: (pmid: string) => Promise<string | null>;
   setCachedFullText: (pmid: string, fullText: string) => Promise<void>;
   isCacheEntryValid: (timestamp: number) => boolean;
+  getSummaryFilePath: (pmid: string) => string;
+  getFullTextFilePath: (pmid: string) => string;
 }
 
 export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
@@ -254,13 +258,23 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
       }
     };
 
+    const getSummaryFilePath = (pmid: string): string => {
+      return join(summaryDir, `${pmid}.json`);
+    };
+
+    const getFullTextFilePath = (pmid: string): string => {
+      return join(fulltextDir, `${pmid}.md`);
+    };
+
     return {
       ensureCacheDir,
       getCachedSummary,
       setCachedSummary,
       getCachedFullText,
       setCachedFullText,
-      isCacheEntryValid
+      isCacheEntryValid,
+      getSummaryFilePath,
+      getFullTextFilePath
     };
   };
 
@@ -408,7 +422,11 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
       ? []
       : (await Promise.all(pmids.map(async (pmid) => {
         const cached = await cache.getCachedSummary(pmid);
-        return cached ? [cached] : [];
+        if (cached) {
+          cached.cacheFilePath = cache.getSummaryFilePath(pmid);
+          return [cached];
+        }
+        return [];
       }))).flat();
     const uncachedPmids: string[] = pmids.filter(
       pmid => !cachedArticles.some(article => article.pmid === pmid)
@@ -532,10 +550,15 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
       if (cache) {
         // For better reliability in tests, we wait for cache operations
         try {
+          const cachedArticle = {...newArticle, cacheFilePath: cache.getSummaryFilePath(pmid)};
+          fetchedArticles.push(cachedArticle);
           await cache.setCachedSummary(pmid, newArticle);
         } catch (err) {
           console.error('Error caching article:', err);
+          fetchedArticles.push(newArticle);
         }
+      }else{
+        fetchedArticles.push(newArticle);
       }
     }
 
@@ -685,7 +708,7 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
     const cachedResults: FullTextResult[] = cache
       ? (await Promise.all(pmids.map(async (pmid) => {
         const cached = await cache.getCachedFullText(pmid);
-        return cached ? { pmid, fullText: cached } : null;
+        return cached ? { pmid, fullText: cached, cacheFilePath: cache.getFullTextFilePath(pmid) } : null;
       }))).filter((result) => result !== null)
       : [];
     const uncachedPmids: string[] = pmids.filter(
@@ -814,6 +837,7 @@ export function createPubMedAPI(options: PubMedOptions): PubMedAPI {
             if (cache && fullText) {
               try {
                 await cache.setCachedFullText(pmid, fullText);
+                resultsMap[pmid].cacheFilePath = cache.getFullTextFilePath(pmid);
               } catch (err) {
                 console.error('Error caching full text:', err);
               }
