@@ -251,11 +251,11 @@ async function main() {
       Cache Directory: ${cacheDir || 'Not configured (caching disabled)'}
       Cache TTL: ${cacheTTL ? `${cacheTTL} seconds` : '86400 seconds (default)'}
   `;
-  console.log(configMessage);
-  
+  console.error(configMessage);
+
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.log('MCP PubMed server running on stdio');
+  console.error('MCP PubMed server running on stdio');
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
