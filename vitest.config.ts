@@ -2,24 +2,14 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
+// This is the base config used by vitest.workspace.ts
+// When running all tests, use vitest.workspace.ts which separates
+// unit tests (parallel) from integration tests (sequential)
 export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
-    // Include both regular test files and integration test files
-    include: ['**/*.{test,spec}.?(c|m)[jt]s?(x)'],
-    // Run integration tests sequentially to avoid API rate limiting
-    sequence: {
-      concurrent: false
-    },
-    // Pool configuration for integration tests
-    poolOptions: {
-      forks: {
-        singleFork: true
-      }
-    },
-    // Run test files matching integration pattern in sequence
-    fileParallelism: false
+    include: ['**/*.{test,spec}.?(c|m)[jt]s?(x)']
   },
   resolve: {
     alias: {

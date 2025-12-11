@@ -1,0 +1,326 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Summary and FullText Snapshot Integration Tests > Combined Summary and FullText Snapshots > should match combined data snapshot > combined-summary-fulltext-39090703 1`] = `
+{
+  "fullText": {
+    "fullTextLength": 42971,
+    "hasFullText": true,
+    "pmid": "39090703",
+  },
+  "summary": {
+    "abstractLength": 2394,
+    "authors": [
+      "Kondo, Takeshi",
+      "Takahashi, Noriyuki",
+      "Aomatsu, Muneyoshi",
+      "Nishigori, Hiroshi",
+    ],
+    "doi": undefined,
+    "hasAbstract": true,
+    "journal": "BMC medical education",
+    "pmcId": "11293181",
+    "pmid": "39090703",
+    "pubDate": "2024-Aug-1",
+    "title": "To teach is to learn twice, revisited: a qualitative study of how residents learn through teaching in clinical environments.",
+  },
+}
+`;
+
+exports[`Summary and FullText Snapshot Integration Tests > FullText Content Verification Snapshots > should snapshot abstract section of fulltext > fulltext-abstract-section-39090703 1`] = `
+"Background Teaching helps the teacher's own learning as a professional—as the saying goes, 'to teach is to learn twice'. Near-peer teaching in clinical practice has been shown to contribute to the development of both teaching skills and necessary competencies for doctors. Research on how near-peer teachers learn through their teaching roles has mainly focused on classroom learning. However, understanding how the phenomenon of 'teaching is learning twice' occurs in clinical settings and its influencing factors is important for the development of a quality workplace learning environment. Therefore, this study investigated how residents learn through teaching in clinical practice and the factors influencing this process.
+
+Methods This study's methodology is based on the constructivist grounded theory from a social constructivist perspective. Several teaching hospitals in Japan were included, and the study participants were post-graduate year 2 residents (PGY2s) from these hospitals. The interviews were recorded, transcribed into text, and analysed by the first author.
+
+Results From January 2016 to July 2022, 13 interviews were conducted with 11 PGY2s from nine educational hospitals. The PGY2s played diverse educational roles in clinical settings and learned competencies as physicians in almost all areas through such roles. We found that knowledge transfer and serving as role models stimulated PGY2s' intrinsic motivation, encouraged reflection on their own experiences, and promoted self-regulated learning. Further, educating about procedural skills and clinical reasoning prompted reflection on their own procedural skills and thought processes. Supporting post-graduate year 1 residents' reflections led to the refinement of PGY2s' knowledge and thought processes through the verbal expression of their learning experiences. Such processes required the formation of a community of practice. Thus, education promoted learning through reflection and clarified the expert images of themselves that PGY2s envisaged.
+
+Conclusions The study found that residents acquire various physician competencies through multiple processes by teaching as near-peer teachers in clinical settings, that a community of practice must be formed for near-peer teaching to occur in a clinical setting, and that teaching brings learning to those who teach by promoting reflection and helping them envision the professionals they aim to be.
+
+Supplementary Information The online version contains supplementary material available at 10.1186/s12909-024-05814-3. Abs1"
+`;
+
+exports[`Summary and FullText Snapshot Integration Tests > FullText Content Verification Snapshots > should snapshot first 2000 characters of fulltext > fulltext-beginning-39090703 1`] = `
+"# To teach is to learn twice, revisited: a qualitative study of how residents learn through teaching in clinical environments
+
+## Abstract
+
+Background Teaching helps the teacher's own learning as a professional—as the saying goes, 'to teach is to learn twice'. Near-peer teaching in clinical practice has been shown to contribute to the development of both teaching skills and necessary competencies for doctors. Research on how near-peer teachers learn through their teaching roles has mainly focused on classroom learning. However, understanding how the phenomenon of 'teaching is learning twice' occurs in clinical settings and its influencing factors is important for the development of a quality workplace learning environment. Therefore, this study investigated how residents learn through teaching in clinical practice and the factors influencing this process.
+
+Methods This study's methodology is based on the constructivist grounded theory from a social constructivist perspective. Several teaching hospitals in Japan were included, and the study participants were post-graduate year 2 residents (PGY2s) from these hospitals. The interviews were recorded, transcribed into text, and analysed by the first author.
+
+Results From January 2016 to July 2022, 13 interviews were conducted with 11 PGY2s from nine educational hospitals. The PGY2s played diverse educational roles in clinical settings and learned competencies as physicians in almost all areas through such roles. We found that knowledge transfer and serving as role models stimulated PGY2s' intrinsic motivation, encouraged reflection on their own experiences, and promoted self-regulated learning. Further, educating about procedural skills and clinical reasoning prompted reflection on their own procedural skills and thought processes. Supporting post-graduate year 1 residents' reflections led to the refinement of PGY2s' knowledge and thought processes through the verbal expression of their learning experiences. Such process"
+`;
+
+exports[`Summary and FullText Snapshot Integration Tests > FullText Snapshots > should match fulltext snapshot for a known PMC article > fulltext-39090703 1`] = `
+{
+  "fullText": "# To teach is to learn twice, revisited: a qualitative study of how residents learn through teaching in clinical environments
+
+## Abstract
+
+Background Teaching helps the teacher's own learning as a professional—as the saying goes, 'to teach is to learn twice'. Near-peer teaching in clinical practice has been shown to contribute to the development of both teaching skills and necessary competencies for doctors. Research on how near-peer teachers learn through their teaching roles has mainly focused on classroom learning. However, understanding how the phenomenon of 'teaching is learning twice' occurs in clinical settings and its influencing factors is important for the development of a quality workplace learning environment. Therefore, this study investigated how residents learn through teaching in clinical practice and the factors influencing this process.
+
+Methods This study's methodology is based on the constructivist grounded theory from a social constructivist perspective. Several teaching hospitals in Japan were included, and the study participants were post-graduate year 2 residents (PGY2s) from these hospitals. The interviews were recorded, transcribed into text, and analysed by the first author.
+
+Results From January 2016 to July 2022, 13 interviews were conducted with 11 PGY2s from nine educational hospitals. The PGY2s played diverse educational roles in clinical settings and learned competencies as physicians in almost all areas through such roles. We found that knowledge transfer and serving as role models stimulated PGY2s' intrinsic motivation, encouraged reflection on their own experiences, and promoted self-regulated learning. Further, educating about procedural skills and clinical reasoning prompted reflection on their own procedural skills and thought processes. Supporting post-graduate year 1 residents' reflections led to the refinement of PGY2s' knowledge and thought processes through the verbal expression of their learning experiences. Such processes required the formation of a community of practice. Thus, education promoted learning through reflection and clarified the expert images of themselves that PGY2s envisaged.
+
+Conclusions The study found that residents acquire various physician competencies through multiple processes by teaching as near-peer teachers in clinical settings, that a community of practice must be formed for near-peer teaching to occur in a clinical setting, and that teaching brings learning to those who teach by promoting reflection and helping them envision the professionals they aim to be.
+
+Supplementary Information The online version contains supplementary material available at 10.1186/s12909-024-05814-3. Abs1
+
+## Content
+
+### Background
+
+Background The adage 'To teach is to learn twice' implies that acting in the role of a teacher contributes to one's growth as a learner []. This means that in a near-peer teaching situation where learners teach other learners of the same or slightly lower grade, near-peer teachers can also learn through teaching []. Several studies have reported on the knowledge and competencies that near-peer teachers acquire through teaching. Medical students who are involved in teaching are better at acquiring and retaining knowledge than those who are not involved in teaching [,]. Near-peer teachers also learn skills in self-reflection, leadership, and communication through teaching []. Here, an understanding of the contents and methods of their learning is required to enhance the learning environment []. Thus, further research on how near-peer teachers learn through teaching is required.
+
+In this regard, Dandavino et al. [] examined how learning by teaching occurs and developed the Dandavino model to explain how medical students learn by teaching. They outline that near-peer teacher learning through teaching is facilitated by the interaction of three processes: (1) metacognitive awareness, which is the reflection on one's own attitude, skills, and knowledge; (2) deliberating practice, which is shown by near-peer teachers' thoughtful instruction to support learners and when they receive feedback about the process from more senior instructors; and (3) self-explanation, which occurs in the mind of near-peer teachers when they explain learning contents to learners and which supports the detection and repair of defective mental models. The model was validated by Srivastava et al. [] for peer-teaching in physics classrooms, where the interaction between improved practice and metacognition described in the Dandavino model was also found in the classroom. Prior research in clinical environments suggests that near-peer teachers gain confidence from the realisation that they can teach, and they reflect on their own thinking when trying to teach a particular learner []. However, such statements in previous research in clinical settings are only fragmentary in describing what near-peer teachers learn from teaching and are insufficient for an in-depth understanding of how near-peer teachers learn from teaching.
+
+Clinical environments are increasingly recognized as important learning places for medical professionals [,]. However, clinical settings are often understaffed, and this is more so the case with staff for education. Therefore, there are high expectations for the enhancement of near-peer teaching in clinical settings []. Exploring near-peer teachers' learning that occurs through their teaching practices in medical environments will contribute to facilitating mutual learning in this setting. Therefore, the following research questions were proposed: What and how do near-peer teachers learn through teaching in the medical field, and what factors influence this learning? Sec1
+
+### Method
+
+Method Ethical considerations The study was conducted with approval from the Ethical Committee of Nagoya University School of Medicine (approval number: 2015-04516983) and in accordance with the Declaration of Helsinki. All participants received prior written explanations regarding the study and provided written consent to participate. The names of the research participants in the obtained data were replaced with letters, such as A, B, and C, and any identifiable information, such as facility names, was replaced with symbols before being treated as data for the analysis. The table linking these names and symbols is stored in encrypted electronic storage to ensure that personal information is adequately protected. Sec3
+
+Quality assurance As a quality assurance standard for this study, the Standards for Reporting Qualitative Research (SRQR) were used []. The SRQR is a set of evaluation criteria for qualitative research consisting of 21 items, created by identifying and reviewing guidelines, reporting standards, and critical evaluation criteria for qualitative research published up to July 2013. Throughout the design, implementation, and writing of this study, the researchers referred to the SRQR and ensured that all items were adequately met in the final work. Sec4
+
+Setting The study was conducted in residencies in multiple teaching hospitals in Japan. In Japan, medical graduates who have completed 6 years of undergraduate medical education are required to undergo 2 years of initial postgraduate residency training. During the 2-year residency, residents rotate through major departments for 4−12 weeks each []. They also work night shifts in emergency departments approximately 4−6 days a month throughout the residency, and their clinical responsibility tends to be higher in the emergency department than in day shift rotation []. Near-peer teaching commonly occurs in the workplace learning environment consisting of post-graduate year 1 residents (PGY1s), post-graduate year 2 residents (PGY2s), and supervising doctors [,]. PGY2s teach PGY1s, young supervising doctors teach PGY2s, and senior supervising doctors teach young supervising doctors. Sec5
+
+Methodology Based on the constructivist grounded theory, researchers have adapted the theory of how to learn through teaching that was developed in non-clinical settings into a theory for clinical settings [,]. In contrast to the traditional grounded theory, which assumes that the researcher begins the study with no preconceptions, constructivist grounded theory aims to ensure that the researcher is aware of the framework they already have and to develop this framework []. In this study, the researchers deemed constructivist grounded theory to be appropriate because prior literature has already provided a general framework for understanding how learning occurs through teaching, and the researchers have a strong involvement in educational settings within clinical environments, possessing internal frameworks. Sec6
+
+Study participants The study participants were PGY2s working in multiple teaching hospitals in Japan. Since PGY2s are both learners and educators who teach PGY1s in clinical settings, the researchers considered PGY2s to be a suitable target population for the study investigating how people learn through teaching in clinical settings. Interviewees were recruited through the clinical educator community and direct acquaintances. The recruitment of study participants was done iteratively. Initial interviewees were recruited to ensure as much diversity as possible in terms of enthusiasm for teaching, size of the institution, and geography, to gain broader insights. After several rounds of interviews, the next set of potential interviewees was considered and selected. Sec7
+
+Data collection One-on-one interviews were conducted to explore the experience of participants in detail. All interviews were conducted by the first author (TK). The topics of the interview questions included participants' clinical responsibilities, their relation to PGY1s and other medical staff, their teaching role, and what and how they learned through their teaching (see Table ). The interviews were audio-recorded and transcribed to text. Additional participants continued to be added until all researchers agreed that sufficient data had been obtained to construct a theory.
+
+Table 1 Interview guide Introduction
+
+Explain that this interview has nothing to do with evaluation or training in the workplace. Explain that there are no right or wrong answers to the questions, and that the purpose of the interview is to find out how they think and feel about each issue. left
+
+Questions to ask
+
+Places of interaction
+
+Where do first- and second-year residents interact?
+
+What kind of interactions occurr in each place: teaching, chatting, or just being there? left
+
+Identify place-based impact
+
+What did you feel from these interactions in each place?
+
+How would it be different if a similar interaction happened with senior doctors or other medical professionals? left
+
+Chronological relationship
+
+What was the chronological relationship before, during, and after the arrival of the first-year students? left
+
+Identify the chronological impact
+
+What did you feel from these interactions in each period?
+
+How would it be different if the similar interaction happened with senior doctors or other medical professionals? left
+
+Impact as a medical doctor
+
+How have these experiences influenced you as a medical doctor? (start with open descriptions, and ask for additional information on the following nine competencies if they do not respond); the nine competencies are professionalism including medical ethics, medical knowledge and problem-solving ability, practical skills and patient care, communication skills, practice of team-based health care, management of quality of care and patient safety, medical practice in society, scientific inquiry, and attitudes for life-long and collaborative learning. left
+
+Closing
+
+Confirm what was said in the interview. Summarize the extracted opinions and confirm them with the participant. Inform the participant that the information will be treated anonymously. If there are any questions, answer them collectively. Thank them for their participation. left hsides groups Tab1 float portrait Par16 Sec8
+
+Data analysis Data analysis was performed by three authors in an iterative process with an audit review. After completing a few interviews, the text data were split into chunks and tabulated into columns. As a tool for the coding process according to grounded theory, the researchers utilised the 'Steps for Coding and Theorization' (SCAT) method, which is a four-step coding process []. In this method, the process is explicitly shown in a table and a storyline, providing text consisting of codes developed to contribute to theory formation; thus, this explicit process improves confirmability []. TK developed codes using the SCAT method and then prepared a preliminary figure of the concept. Images used in the figure were developed with licensed authoring software or purchased from creators. Co-authors (NT and MA) examined the text, codes, storyline, and figure independently before discussing them for further refinement. They also discussed the requirements for the next participants, who were recruited based on the results of the discussion, and the same process was conducted to refine the codes and the figure. The process was repeated until the three authors agreed on data saturation. The last author (HN) examined the entire data and analysis process again with TK to complete the data analysis. Sec9
+
+Reflexivity This study was conducted by multiple researchers who are also medical education researchers and supervisors: TK is a supervisor at a university hospital and supervises residents in emergency medicine at Nagoya University; TK is also involved in teaching residents as an educational consultant at several teaching hospitals. TK is a medical education researcher and conducts research on resident assessments; although some of TK's interviewees were residents whom he directly supervised, the study included interviewees with whom he was not directly involved in teaching. NT is a supervisor of residents in an outpatient general medicine department at a university hospital and is currently researching empathy in medical education. MA is a supervisor at a city hospital and is conducting research on empathy as a medical educator. HN is a supervisor at a university hospital and is conducting research on empathy as a medical educator. HN supervises residents in the general medicine outpatient department of a university hospital. He is a medical education researcher specialising in professionalism. The researchers all participated in the analysis by engaging with the residents, understanding their situations, and bringing the perspectives of multiple specialisms in medical education research. The process of analysis was articulated using the SCAT method and the discussion process was recorded during the audit trail. Sec10
+
+Patient and public involvement Patients or the public were not involved in designing or conducting this research. The researchers plan to disseminate this paper publicly by introducing it to members of the Japanese Society for Medical Education. Sec11 Sec2
+
+### Results
+
+Results A total of 13 interviews were conducted with 11 PGY2s (seven men and four women) from nine teaching hospitals between January 2016 and July 2022. Each interview lasted 1–2 h. What and how PGY2s learned through teaching, followed by what influenced them in this process, is described below. Regarding the citations in the following descriptions, each ID is based on the interview number and the order of data extraction (e.g., 10–87). The English translations of the interview data and the list of IDs can be downloaded from Additional File. What and how PGY2s learn through teaching The analysis of the interviews reveals that PGY2s played diverse roles as educators in the medical field. In addition to imparting knowledge and skills, they observed and evaluated PGY1s, assisted them in reflecting on their practice, coordinated learning environments to consider PGY1s' abilities, and served as role models. Through their role as educators, PGY2s acquired competencies in almost all the domains described in the Guideline for Medical Residency 2020 [], including medical knowledge, procedural skills and patient care, patient safety and quality improvement, lifelong learning, medical practice in the context of society, communication, practice in interprofessional teams, and professionalism. The learning that PGY2s gained through teaching, and how each aspect of learning occurred through particular educational activities, is described below. Medical knowledge As mentors, when PGY2s were transferring knowledge and helping PGY1s reflect, PGY2s were re-exposed to knowledge that they had learned in the past, which helped to strengthen their current knowledge. Additionally, in doing so, their awareness of the incompleteness of their knowledge and their desire to impart more accurate knowledge led them to explore diverse sources of information, including related literature, which contributed to structuring and concretizing their knowledge. A PGY2 explains rereading previous lecture transcripts and texts to reconfirm his knowledge to prepare lectures for PGY1s: Sec14
+
+Procedural skills and patient care PGY2s learned about procedural skills and patient care themselves as they taught clinical procedures and clinical reasoning. The teaching of clinical procedures motivated PGY2s to perform the procedures on their own and contributed to their awareness of standard procedures and verbalisation of implicitly learned experiences. Teaching clinical reasoning contributed to its verbalisation and reflection and observing this among PGY1s provided an opportunity for PGY2s to learn about others' clinical reasoning.
+
+In addition, a PGY2 realised that as he observed PGY1s to teach them clinical reasoning, it led him to learn about others' reasoning processes and was a learning experience for him as well: Sec15
+
+Patient safety and quality of medical care PGY2s were prepared to review their own clinical processes to ensure more accurate and faster care so that they could adjust the learning environment for PGY1s in the clinical setting. In addition, by working as interpreters between PGY1s and their clinical supervisors, PGY2s gained a better understanding of work processes and were able to recognize problems in the system.
+
+The following two PGY2s were treating other patients quickly to ensure that the less experienced PGY1 residents had adequate time to thoroughly examine and learn from their patients. The PGY2s also reviewed and prepared their own practice processes so that they could do so.
+
+In the following example, a PGY2 describes becoming aware of certain problems with communication. This PGY2 communicates via chat tools with a senior doctor who leaves the ward on various errands and connects the senior doctor with PGY1s and other ward staff: Sec16
+
+Lifelong learning PGY2s served as role models and engaged in knowledge transfer to PGY1s, which motivated PGY1s' learning. Furthermore, PGY2s' observations of PGY1s' medical treatment helped PGY2s consider their own current achievements and future goals. The following PGY2 explains how, when faced with previously unexamined questions that arose in clinical practice, they began to research and summarise clinical questions in an attempt to answer PGY1s' questions:
+
+The following PGY2s were previously unable to grasp how they had developed as doctors over a year when they were only observing senior doctors. However, by observing PGY1s and comparing themselves with them, they were able to understand how they had developed, and based on this, they were able to clearly envision how they should progress to become the senior doctors they aspired to be in the future. Sec17
+
+Medical practice in the context of society Through observing PGY1s' practices and comparing them to their own practices and those of their senior doctors, PGY2s became more aware not only of the symptoms and diseases occurring in the patients they saw at that moment but also of the patients' families and their long-term progress. Sec18
+
+Communication PGY2s taught PGY1s how to communicate with patients and provided feedback to PGY1s as they observed PGY1s communicating with patients. Through this process, PGY2s became aware of the need to reflect on and improve their own communication as well. The following PGY2 began to reflect on their own communication through observing PGY1s' medical treatment: Sec19
+
+Practice in interprofessional teams PGY2s supported PGY1s with problems that arose when PGY1s performed their medical duties. Through such support, they were able to become aware of the roles of multiple professions. The following PGY2 was communicating with medical clerks, prompted by questions from PGY1s. Sec20
+
+Professionalism PGY2s reflected on their knowledge and experience to share their knowledge with PGY1s. This suggests that the ability to be a reflective practitioner [], which is important for physicians' professionalism, was cultivated. In addition, PGY2s reflected on and improved their own attitudes through observing PGY1s' practices and by serving as role models to PGY1s. Through observing PGY1s' medical practice, a PGY2 was inspired by PGY1s' sincere attitude towards patients and made efforts to change their own behaviour. The following PGY2 observed a PGY1 accompanying his assigned patient to rehabilitation, which reaffirmed the importance of such gestures in establishing a good doctor-patient relationship. Sec21 Sec13
+
+Factors influencing learning through teaching During the interviews, it became clear that multiple factors influenced PGY2s' learning through teaching in clinical settings. The factors were divided into two categories: those related to the system and those related to the PGY2s themselves. Factors related to the system were identified as the place where residents can be involved in the practice together, a practice system based on near-peer teaching, discretion in practice, respect as an educator, and the place to teach. Further, factors related to the system were identified as shared tasks, communication, and responsibility for medical practice, while factors related to the PGY2s themselves included reflection, aspirations as supervising physicians, and adequate competence in the relevant area. Further details on each of these aspects are given below. System factors Shared tasks Education from PGY2s to PGY1s was more likely to occur when PGY2s and PGY1s were not just in the same place but had a shared task, such as working on the same case. For example, the following PGY2 worked with PGY1s in the same emergency room shift and gave advice before the PGY1s treated patients:
+
+Education from PGY2s to PGY1s was less likely to occur when they were in the same place but working on completely different cases. The following explanation from an interviewee suggests that residents taught each other about cases when PGY2s and PGY1s worked on cases together in the department in which they rotated:
+
+However, education from PGY2s to PGY1s did not occur when they were on rotation in the same department but working on different cases: Sec213
+
+Communication PGY2s functioned as educators when there was a mechanism for PGY2s and PGY1s to communicate about their practice. For example, in Japan, PGY2s sometimes teach PGY1s, and then a senior advisor teaches PGY2s; this is called the(translates to 'roof tile' in Japanese) system. Under such a system, PGY1s always consult PGY2s first about their practice; thus, much communication occurs between PGY2s and PGY1s. In the emergency department rotations to which the following PGY2s belonged, PGY1s consulted PGY2s on all cases under thesystem, so PGY2s were always involved in educating PGY1s by giving advice and evaluating PGY1s' assessments.
+
+At the facility where the following PGY2 belonged, the practice structure differed according to the time of day, with no communication between PGY2s and PGY1s occurring when PGY1s were supposed to consult directly with senior doctors. However, communication occurred between PGY2s and PGY1s during the times when PGY1s were supposed to consult with PGY2s, with instructions and knowledge shared from PGY2s to PGY1s.
+
+In particular settings, PGY2s and PGY1s were encouraged to interact with each other in different years because of the mosaic arrangement of desks to avoid clumping PGY2s and PGY1s in the same year group: Sec214
+
+Responsibility for medical practice In clinical settings, PGY2s were actively consulting with and advising PGY1s and creating a learning environment for PGY1s where they had some discretion and responsibility for medical care, for example, deciding what tests and treatments to perform and whether to send patients home. PGY2s, certified by a committee of supervisors at the institutions where they belonged, had greater discretion in their practice in the emergency department, and PGY1s actively consulted with such PGY2s in making decisions.
+
+Meanwhile, when PGY2s only had the same discretionary authority as PGY1s regarding their practice, PGY2s avoided making adjustments to facilitate PGY1s' learning in the clinic or giving advice that was directly related to the content of their practice. In the emergency department where PGY2s were working in a different hospital, PGY2s were encouraged to teach PGY1s, but senior doctors determined the course of treatment and PGY2s were rarely entrusted with clinical decisions. Under these circumstances, PGY2s were withheld from teaching PGY1s. Sec234 Sec23
+
+PGY2s' own factors Reflection PGY2s' teaching of PGY1s encouraged the former to reflect, which contributed to their learning, but whether this led to successful reflection varied from person to person. As described previously, when PGY2s prepared to teach PGY1s, they reflected on their own previous experiences and learning to explore new knowledge and structure their knowledge. They also reflected on their own knowledge and skills during the teaching sessions, recognizing their own imperfections and verbalizing what they had learned tacitly. In addition, PGY2s' reflection on what happens as a result of their teaching led to their own learning. The following PGY2 was reflected on his own behaviour, as he was aware that he was a role model, that his behaviour was mirrored by PGY1s, and that the knowledge he taught affected PGY1s' practice.
+
+However, some residents were unable to reflect on the impact of their teaching on themselves or their teaching and attitude on others, and could not successfully link teaching to their personal development, as seen in the following quote from a PGY2: Sec223
+
+Supervising physicians' future vision of themselves PGY2s' desire to move closer toward the image of the supervising physician they envisioned to be in the future motivated their learning. This vision of the supervising doctor influenced the way PGY2s interacted with PGY1s in terms of knowledge transfer, acting as a role model for PGY1s, and creating a learning environment for PGY1s. One PGY2, who was not in the practice of searching for articles in English at first, followed the example of his senior doctors and began to search for English-language articles and share them with PGY1s.
+
+This image of the supervising doctor was shaped by the influence of past experiences of being supervised. The image of the supervising doctor was sometimes formed based on the good role models mentioned above; at other times, it was formed by recalling and refraining from the behaviours of bad role models. For example, a PGY2 aimed to be gentle with the PGY1s, trying not to be like the senior doctors who were always irritable.
+
+In addition, the image of the supervising doctor sometimes changed during the reflections with the senior doctors. One PGY2 thought that, as supervisors, PGY2s should avoid taking control of PGY1s' medical care in the teaching process, but during his reflections on senior doctors, he came to believe that the supervisor should lead and show the junior doctors how to treat patients.
+
+This image of the supervisor they aspired to become was also made clearer by the presence of PGY1s, the target group to teach. The following PGY2 had a clear desire to become a knowledgeable supervisor due to the presence of PGY1s. Sec224
+
+Sufficient competency in the relevant area For PGY2s to teach PGY1s, they needed to be competent in the area they were teaching and trusted by others. The following PGY2 was fully proficient in arterial punctures for blood gas sampling during their previous year's residency and actively taught the technique when requested by PGY1s.
+
+If PGY2s did not have sufficient competency in the relevant area, they would consider themselves unfit to teach and refrain from teaching PGY1s, as in the case of a PGY2 who was enthusiastic about teaching but lacked confidence in suturing procedures: '&#8230;I don't teach suturing procedures very much. I don't think I'm really good at those procedures &#8230;' (Dr. A, 2−129). Sec225 Sec222 Sec22
+
+An integrative model of learning through teaching The processes through which learning occurs through teaching in a clinical environment and the factors influencing it have been described so far as they can be integrated using several conceptual frameworks, such as legitimate peripheral participation, communities of practice, and reflection. The structure of a community of practice including PGY2s and PGY1s constitutes common tasks, communication, and position as practitioners. In this context, the image of the senior doctor to aspire to as an expert within the community of practice directs learning and teaching, and promotes reflection; this process is summarised in Fig. .
+
+Fig. 1 Integrated model of learning through teaching
+
+Legend: PGY1s and PGY2s form a community of practice when they have a shared task, ensure adequate communication, and have roles as practitioners. Teaching promotes the learning of those doing the teaching through a clear awareness of the expert they wish to become and through reflecting their actions back to them http://www.w3.org/1999/xlink d33e622 float portrait 12909_2024_5814_Fig1_HTML.jpg Fig1 float portrait Par86
+
+Prior studies have established a theory of legitimate peripheral participation that sees learning as a process of participation in a community of practice, rather than merely the acquisition of knowledge by an individual [,]. From the perspective of legitimate peripheral participation, PGY2s are both learners aiming to become experts and educators guiding new PGY1s. The interviews revealed that the image of the senior doctor to aspire to influences PGY2s' learning. Here, the PGY2s envisage themselves as the experts they aspire to be within the community of practice. This can theoretically influence both the direction in which PGY2s themselves learn and the direction in which they educate PGY1s. Theoretical aspects can also explain how this influences both the PGY2s' own direction of learning and the direction of teaching PGY1s. In addition, the presence of PGY1s, the target of teaching, makes this image of the desired expert clearer for the PGY2s, and teaching may be helpful in forming the image of the desired expert.
+
+Reflection is said to play an important role in learning in such communities of practice [,]. The interviews revealed that the PGY2s were inspired by teaching PGY1s, were able to reflect in preparation for teaching, and connected teaching to their own growth by gaining awareness of their teaching practice and reflecting on the impact that teaching had. However, PGY2s did not connect teaching to their own learning if they were unable to reflect well throughout. Thus, teaching in communities of practice may need to support reflection in some cases while facilitating learning through reflection. Sec25 Sec12 results
+
+### Discussion
+
+Discussion This study identified how PGY2s, who are responsible for near-peer teaching in clinical settings, learn through teaching. It also explored what factors are associated with teaching and learning through teaching in clinical settings. PGY2s had several educational roles, including transferring knowledge, adjusting the learning environment, supporting reflection, evaluating through observation, and facilitating communication among senior doctors, other professionals, and PGY1s. Through such teaching, PGY2s were learning a wide range of competencies as doctors. The results revealed that these processes of learning through teaching in such healthcare settings can be integrated by using the community of practice theory and reflection as a framework.
+
+PGY2s were learning diverse competencies as doctors while performing various roles as educators within the clinical setting. According to Harden and Lilley [], the role of medical educators can be divided into eight categories: informant/coach, facilitator/mentor, curriculum developer/implementer, assessor, role model, manager, researcher, and professional. Based on these eight categories, the roles that PGY2s played in the clinical practice were as follows: informants and coaches through the provision of knowledge and support in clinical practice; facilitators and mentors through the support of reflection and step-by-step teaching of procedures; curriculum developer/implementer, albeit on a small scale; evaluator, through feedback based on observation; role model, through setting the example of oneself; administrator, through the role of adjusting the learning environment; researcher, in the sense of reflecting on and trying to improve one's own educational practice; and professional, regarding their hard work to improve as a doctor. The competencies that residents acquire by the end of their clinical training in Japan are medical knowledge, procedures and patient care, patient safety and quality improvement, lifelong learning, medical practice in society, communication, interprofessional team practice, professionalism, and research skills. This study shows that PGY2s can learn through teaching about all competencies, except for research skills, which they are not usually involved in as part of clinical practice. This ability to learn a range of competencies by teaching is suggested by reports that, in peer-tutorial courses, students learned competencies in broad areas []. The current study suggests that various competencies can be learnt through teaching, not only in classroom teaching as in the aforementioned studies but also in workplace-based learning settings. In addition, this study also describes how such learning occurs.
+
+Dandavino et al. [] argue that teaching is a process in which metacognitive awareness, deliberate practice with feedback, and self-explanation interact with each other to further the learning of the person teaching. These three processes are said to be interrelated and can be stimulated or inhibited by social interactions and contextual factors []. Metacognitive awareness refers to the internal and external motivations stimulated by the teaching position, leading to self-regulated learning; PGY2s are driven by the internal motivation to appear as good supervisors when transferring knowledge and serving as role models to PGY1s, to reflect on their own experiences and reconstruct their knowledge through self-regulated learning. Deliberate practice with feedback indicates that teaching is an act of consciously practising thought processes and procedures, and furthermore, feedback is applied by giving it when teaching. The PGY2s who took on a teaching role in this study became aware of the quirks in the procedures they were performing and relearned standard procedures to feed back to themselves when teaching clinical procedures. The self-explanation effect refers to the fact that when teaching, one must first explain to oneself the content that one is trying to teach and that the knowledge is reconstructed when one realizes one's lack of understanding or gaps in knowledge as a result of this process. In this study, PGY2s were verbalising their tacitly learned experiences and explaining them to themselves as well as to the learners when they were transferring knowledge, assisting in teaching, and reflecting on the procedures. In this process, the knowledge that PGY2s had learned tacitly was reconstructed. This concrete depiction of the process of learning through teaching also embodies how this process is stimulated or inhibited by social interactions and contextual factors.
+
+This study identified the factors (in terms of context and social interactions) that influence PGY2s' teaching and learning through teaching in specific clinical settings, a topic less explored in previous research on teaching in clinical settings. Jones et al. [] conducted focus group discussions with medical students, educational stakeholders, and GP speciality trainees with teaching responsibilities and found that learners valued the experience of learning from educators in different positions and at different ages and that the experience of learning from a near-peer teacher was important. The study found that GP speciality trainees who were engaged in near-peer teaching had a greater understanding, through the teaching process, of the content they were teaching. In a study of a program of teaching students by interns at the patient's bedside and analysing the feedback forms, it was found that near-peer teaching was well accepted by both learners and educators who became near-peer teachers; interns felt that teaching helped them to develop not only as educators but also as doctors []. Although these previous studies have revealed that near-peer teachers learn through teaching in clinical practice, they were conducted in semi-laboratory environments prepared for teaching; therefore, the factors influencing the process of learning through teaching that occur spontaneously in clinical practice were difficult to explore. In this study, although some hospitals had established a system of care with an awareness of near-peer teaching, this was more implicit than institutionalised. Further, it was not confirmed whether near-peer teaching occurred in clinical practice and whether near-peer teachers learned through teaching; this study found that whether they learned through teaching was influenced by a variety of factors. Therefore, it was possible to analyse the structure of teaching and learning through teaching in clinical practice as requiring a system that encourages sufficient communication to address common tasks, sufficient competence, and practitioner responsibility on the part of the near-peer teacher. Additionally, it is important to note that learning is influenced by reflection and aspirations for expert visions. This exploration led to the development of a model to explain learning through teaching in clinical practice.
+
+This study suggests that for learning through teaching to occur in healthcare settings, the construction of communities of practice is necessary; further, learning is influenced by reflection and images of experts within the community of practice. The use of the lens of community of practice in exploring learning in clinical practice has yielded meaningful findings. For example, Hindi et al. [] research experiential learning in pharmacy education in general practice using community of practice as a lens and analyse how learners enter the community of practice. The importance of community in near-peer teaching has also been mentioned, although a scoping review on informal near-peer teaching does not use the term community of practice []. Regarding community of practice, this study suggests that effective interaction and learning occur when the components of the community of practice, domain/community/practice, are aligned and a community of practice is established. The study also suggests the importance of reflection in learning in communities of practice as well as showing that the act of teaching others facilitates this and the image of an expert within the community of practice influences the direction of learning. These are important findings for enhancing learning processes and practices in healthcare settings in the future. Limitations This study draws on interviews with residents to illustrate how they learn through teaching, and it has succeeded in depicting the process of learning through teaching. However, given the study sample and the qualitative research design, more multifaceted findings could be obtained in the future by combining this study's findings with quantitative studies and interviews with supervisors.
+
+All interviewees were Japanese residents undergoing training in Japan. The image of the supervisor and the relationship between the supervisor and learner varies across cultures, particularly in Asian countries such as Japan, where there is a strong authority gradient between the supervisor and learner []. This affects the process of learning through teaching; thus, its application in other countries including the West needs to consider such cultural factors. Additionally, this study focused on PGY2s and PGY1s in Japanese hospitals; thus, caution should be exercised in applying these findings to other environments, different levels of training, or international settings. Nonetheless, the present findings are linked to prior theories, increasing the transferability of this theory.
+
+Additionally, the author involved in the interviews was a supervisor at the hospital, which may have influenced the interviews due to the authority gradient. In this study, to minimise this influence, the researchers assured the interviewees that the interview was confidential and that what they shared would not affect their evaluation. Furthermore, as a supervising physician, the interviewer was able to ask questions based on his understanding of residents' situations and working environments, which allowed us to elicit deeper insights. Sec27 Sec26 discussion
+
+### Conclusions
+
+Conclusions This study clarified the processes by which PGY2s play diverse roles as educators in the clinical setting and through which they acquire various competencies as physicians. This study revealed that the formation of a community of practice is necessary for near-peer teaching to occur in a medical setting, that teaching channels learning through reflection, and that the image of the expert that one aspires to be directs learning. Sec28 conclusion
+
+Electronic supplementary material Below is the link to the electronic supplementary material.
+
+Supplementary Material 1: ID and transcription of the interviews. This file contains English translations of all interviews, along with the IDs of each section and the identification of the interviewees. http://www.w3.org/1999/xlink 12909_2024_5814_MOESM1_ESM.xlsx float portrait local-data MOESM1 float portrait Sec29 supplementary-material",
+  "pmid": "39090703",
+}
+`;
+
+exports[`Summary and FullText Snapshot Integration Tests > FullText Snapshots > should match fulltext structure snapshot > fulltext-structure-39090703 1`] = `
+{
+  "hasAbstract": true,
+  "hasContent": true,
+  "hasTitle": true,
+  "headers": [
+    "# To teach is to learn twice, revisited: a qualitative study of how residents learn through teaching in clinical environments",
+    "## Abstract",
+    "## Content",
+    "### Background",
+    "### Method",
+    "### Results",
+    "### Discussion",
+    "### Conclusions",
+  ],
+  "paragraphCount": 86,
+  "totalLength": 42971,
+  "wordCount": 6378,
+}
+`;
+
+exports[`Summary and FullText Snapshot Integration Tests > Summary Snapshots > should match summary snapshot for COVID article > article-summary-34686906 1`] = `
+{
+  "abstract": "This study highlights an unmet need in osteoporosis management, suggesting that beyond bone mineral density and fracture history, gender, fracture type, and age should be considered for fracture risk assessment. Following fragility fracture, men, patients with a spine or hip fracture, and those aged&#x2009;&#x2265;&#x2009;65 have a higher disease burden. The objective of this study was to characterize osteoporosis-related fracture incidence and identify predictors of subsequent fractures and mortality. This retrospective cohort study, conducted within Kaiser Permanente Southern California, included patients aged&#x2009;&#x2265;&#x2009;50&#xa0;years with qualifying fractures from 1/1/2007 to 12/31/2016, identified from diagnosis/procedure codes. Rates for fracture incidence, mortality, and resource utilization in the year post-fracture are reported. Associations between index fracture types and demographic/clinical characteristics, and mortality, subsequent fracture, and rehospitalization outcomes were estimated. Of 63,755 eligible patients, 66.7% were&#x2009;&#x2265;&#x2009;65&#xa0;years and 69.1% female. Index fractures included nonhip/nonspine (64.4%), hip (25.3%), and spine (10.3%). Age-adjusted subsequent fracture rate/100 person-years was higher for those with an index spine (14.5) versus hip fracture (6.3). Hospitalization rate/100 person-years was highest for patients&#x2009;&#x2265;&#x2009;65 (31.8) and for spine fractures (43.5). Men (vs women) had higher age-adjusted rates of hospitalization (19.4; 17.7), emergency room visits (73.8; 66.3), and use of rehabilitation services (31.7; 27.2). The 30-day age-adjusted mortality rate/100 person-years was 46.7, 32.4, and 15.5 for spine, hip, and nonspine/nonhip fractures. The 1-year age-adjusted mortality rate/100 person-years was 14.7 for spine and 15.6 for hip fractures. In multivariable analyses, spine and hip fractures (vs nonhip/nonspine fractures) were significant predictors of 1-year mortality, all-cause and osteoporosis-related hospitalization, and nursing home use (all P-values&#x2009;<&#x2009;0.0001). Morbidity is high in the year following a fragility fracture and men, patients with a spine or hip fracture, and those aged&#x2009;&#x2265;&#x2009;65 have a greater disease burden.",
+  "authors": [
+    "Adams, Annette L",
+    "Ryan, Denison S",
+    "Li, Bonnie H",
+    "Williams, Setareh A",
+    "Wang, Yamei",
+    "Weiss, Richard J",
+    "Black, Dennis M",
+  ],
+  "doi": undefined,
+  "journal": "Osteoporosis international : a journal established as result of cooperation between the European Foundation for Osteoporosis and the National Osteoporosis Foundation of the USA",
+  "pmcId": "8930877",
+  "pmid": "34686906",
+  "pubDate": "2022-Apr",
+  "title": "Outcomes post fragility fracture among members of an integrated healthcare organization.",
+}
+`;
+
+exports[`Summary and FullText Snapshot Integration Tests > Summary Snapshots > should match summary snapshot for a known article > article-summary-39090703 1`] = `
+{
+  "abstract": "Teaching helps the teacher's own learning as a professional-as the saying goes, 'to teach is to learn twice'. Near-peer teaching in clinical practice has been shown to contribute to the development of both teaching skills and necessary competencies for doctors. Research on how near-peer teachers learn through their teaching roles has mainly focused on classroom learning. However, understanding how the phenomenon of 'teaching is learning twice' occurs in clinical settings and its influencing factors is important for the development of a quality workplace learning environment. Therefore, this study investigated how residents learn through teaching in clinical practice and the factors influencing this process. This study's methodology is based on the constructivist grounded theory from a social constructivist perspective. Several teaching hospitals in Japan were included, and the study participants were post-graduate year 2 residents (PGY2s) from these hospitals. The interviews were recorded, transcribed into text, and analysed by the first author. From January 2016 to July 2022, 13 interviews were conducted with 11 PGY2s from nine educational hospitals. The PGY2s played diverse educational roles in clinical settings and learned competencies as physicians in almost all areas through such roles. We found that knowledge transfer and serving as role models stimulated PGY2s' intrinsic motivation, encouraged reflection on their own experiences, and promoted self-regulated learning. Further, educating about procedural skills and clinical reasoning prompted reflection on their own procedural skills and thought processes. Supporting post-graduate year 1 residents' reflections led to the refinement of PGY2s' knowledge and thought processes through the verbal expression of their learning experiences. Such processes required the formation of a community of practice. Thus, education promoted learning through reflection and clarified the expert images of themselves that PGY2s envisaged. The study found that residents acquire various physician competencies through multiple processes by teaching as near-peer teachers in clinical settings, that a community of practice must be formed for near-peer teaching to occur in a clinical setting, and that teaching brings learning to those who teach by promoting reflection and helping them envision the professionals they aim to be.",
+  "authors": [
+    "Kondo, Takeshi",
+    "Takahashi, Noriyuki",
+    "Aomatsu, Muneyoshi",
+    "Nishigori, Hiroshi",
+  ],
+  "doi": undefined,
+  "journal": "BMC medical education",
+  "pmcId": "11293181",
+  "pmid": "39090703",
+  "pubDate": "2024-Aug-1",
+  "title": "To teach is to learn twice, revisited: a qualitative study of how residents learn through teaching in clinical environments.",
+}
+`;
+
+exports[`Summary and FullText Snapshot Integration Tests > Summary Snapshots > should match summary snapshot for multiple articles > multiple-article-summaries 1`] = `
+[
+  {
+    "abstract": "Teaching helps the teacher's own learning as a professional-as the saying goes, 'to teach is to learn twice'. Near-peer teaching in clinical practice has been shown to contribute to the development of both teaching skills and necessary competencies for doctors. Research on how near-peer teachers learn through their teaching roles has mainly focused on classroom learning. However, understanding how the phenomenon of 'teaching is learning twice' occurs in clinical settings and its influencing factors is important for the development of a quality workplace learning environment. Therefore, this study investigated how residents learn through teaching in clinical practice and the factors influencing this process. This study's methodology is based on the constructivist grounded theory from a social constructivist perspective. Several teaching hospitals in Japan were included, and the study participants were post-graduate year 2 residents (PGY2s) from these hospitals. The interviews were recorded, transcribed into text, and analysed by the first author. From January 2016 to July 2022, 13 interviews were conducted with 11 PGY2s from nine educational hospitals. The PGY2s played diverse educational roles in clinical settings and learned competencies as physicians in almost all areas through such roles. We found that knowledge transfer and serving as role models stimulated PGY2s' intrinsic motivation, encouraged reflection on their own experiences, and promoted self-regulated learning. Further, educating about procedural skills and clinical reasoning prompted reflection on their own procedural skills and thought processes. Supporting post-graduate year 1 residents' reflections led to the refinement of PGY2s' knowledge and thought processes through the verbal expression of their learning experiences. Such processes required the formation of a community of practice. Thus, education promoted learning through reflection and clarified the expert images of themselves that PGY2s envisaged. The study found that residents acquire various physician competencies through multiple processes by teaching as near-peer teachers in clinical settings, that a community of practice must be formed for near-peer teaching to occur in a clinical setting, and that teaching brings learning to those who teach by promoting reflection and helping them envision the professionals they aim to be.",
+    "authors": [
+      "Kondo, Takeshi",
+      "Takahashi, Noriyuki",
+      "Aomatsu, Muneyoshi",
+      "Nishigori, Hiroshi",
+    ],
+    "doi": undefined,
+    "journal": "BMC medical education",
+    "pmcId": "11293181",
+    "pmid": "39090703",
+    "pubDate": "2024-Aug-1",
+    "title": "To teach is to learn twice, revisited: a qualitative study of how residents learn through teaching in clinical environments.",
+  },
+  {
+    "abstract": "This study highlights an unmet need in osteoporosis management, suggesting that beyond bone mineral density and fracture history, gender, fracture type, and age should be considered for fracture risk assessment. Following fragility fracture, men, patients with a spine or hip fracture, and those aged&#x2009;&#x2265;&#x2009;65 have a higher disease burden. The objective of this study was to characterize osteoporosis-related fracture incidence and identify predictors of subsequent fractures and mortality. This retrospective cohort study, conducted within Kaiser Permanente Southern California, included patients aged&#x2009;&#x2265;&#x2009;50&#xa0;years with qualifying fractures from 1/1/2007 to 12/31/2016, identified from diagnosis/procedure codes. Rates for fracture incidence, mortality, and resource utilization in the year post-fracture are reported. Associations between index fracture types and demographic/clinical characteristics, and mortality, subsequent fracture, and rehospitalization outcomes were estimated. Of 63,755 eligible patients, 66.7% were&#x2009;&#x2265;&#x2009;65&#xa0;years and 69.1% female. Index fractures included nonhip/nonspine (64.4%), hip (25.3%), and spine (10.3%). Age-adjusted subsequent fracture rate/100 person-years was higher for those with an index spine (14.5) versus hip fracture (6.3). Hospitalization rate/100 person-years was highest for patients&#x2009;&#x2265;&#x2009;65 (31.8) and for spine fractures (43.5). Men (vs women) had higher age-adjusted rates of hospitalization (19.4; 17.7), emergency room visits (73.8; 66.3), and use of rehabilitation services (31.7; 27.2). The 30-day age-adjusted mortality rate/100 person-years was 46.7, 32.4, and 15.5 for spine, hip, and nonspine/nonhip fractures. The 1-year age-adjusted mortality rate/100 person-years was 14.7 for spine and 15.6 for hip fractures. In multivariable analyses, spine and hip fractures (vs nonhip/nonspine fractures) were significant predictors of 1-year mortality, all-cause and osteoporosis-related hospitalization, and nursing home use (all P-values&#x2009;<&#x2009;0.0001). Morbidity is high in the year following a fragility fracture and men, patients with a spine or hip fracture, and those aged&#x2009;&#x2265;&#x2009;65 have a greater disease burden.",
+    "authors": [
+      "Adams, Annette L",
+      "Ryan, Denison S",
+      "Li, Bonnie H",
+      "Williams, Setareh A",
+      "Wang, Yamei",
+      "Weiss, Richard J",
+      "Black, Dennis M",
+    ],
+    "doi": undefined,
+    "journal": "Osteoporosis international : a journal established as result of cooperation between the European Foundation for Osteoporosis and the National Osteoporosis Foundation of the USA",
+    "pmcId": "8930877",
+    "pmid": "34686906",
+    "pubDate": "2022-Apr",
+    "title": "Outcomes post fragility fracture among members of an integrated healthcare organization.",
+  },
+]
+`;
