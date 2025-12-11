@@ -3,7 +3,7 @@ import { createPubMedAPI } from '../pubmed-api.js';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 
-describe('PMID 40468340 Abstract Verification', () => {
+describe.sequential('PMID 40468340 Abstract Verification', () => {
   const testCacheDir = join(process.cwd(), 'test-pmid-40468340-cache');
   let api: ReturnType<typeof createPubMedAPI>;
 

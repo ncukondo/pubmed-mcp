@@ -3,7 +3,7 @@ import { spawn, ChildProcess } from 'child_process';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 
-describe('Server Integration with Cache Configuration', () => {
+describe.sequential('Server Integration with Cache Configuration', () => {
   const testCacheDir = join(process.cwd(), 'test-server-cache');
   let serverProcess: ChildProcess | null = null;
 
